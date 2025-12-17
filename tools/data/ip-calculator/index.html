@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络和IP地址计算器</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .result-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .result-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            min-height: 50px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .subnet-table th, .subnet-table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">数据转换</li>
+                <li class="breadcrumb-item active" aria-current="page">网络和IP地址计算器</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">网络和IP地址计算器</h5>
+            </div>
+            <div class="card-body">
+                <form id="ipCalcForm">
+                    <div class="mb-3">
+                        <label for="ipAddress" class="form-label">IP 地址</label>
+                        <input type="text" class="form-control" id="ipAddress" placeholder="例如: 192.168.1.1" value="192.168.1.1">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="subnetMask" class="form-label">子网掩码</label>
+                        <select class="form-select" id="subnetMask">
+                            <option value="24" selected>/24 (255.255.255.0)</option>
+                            <option value="8">/8 (255.0.0.0)</option>
+                            <option value="16">/16 (255.255.0.0)</option>
+                            <option value="25">/25 (255.255.255.128)</option>
+                            <option value="26">/26 (255.255.255.192)</option>
+                            <option value="27">/27 (255.255.255.224)</option>
+                            <option value="28">/28 (255.255.255.240)</option>
+                            <option value="29">/29 (255.255.255.248)</option>
+                            <option value="30">/30 (255.255.255.252)</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3 d-none" id="customSubnetGroup">
+                        <label for="customSubnet" class="form-label">自定义子网掩码</label>
+                        <input type="text" class="form-control" id="customSubnet" placeholder="例如: 255.255.255.0">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="calculateBtn">
+                        <i class="bi bi-calculator me-1"></i>
+                        计算网络信息
+                    </button>
+                </form>
+                
+                <div class="mt-4 d-none" id="resultSection">
+                    <div class="result-section">
+                        <div class="result-header">
+                            <h6 class="mb-0">网络信息</h6>
+                        </div>
+                        <div class="result-content" id="networkInfo"></div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <div class="result-header">
+                            <h6 class="mb-0">子网信息</h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped subnet-table">
+                                <thead>
+                                    <tr>
+                                        <th>项目</th>
+                                        <th>值</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subnetTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于网络和IP地址</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是 IP 地址</h6>
+                <p>
+                    IP 地址（Internet Protocol Address）是分配给连接到使用 IP 进行通信的网络的每个设备的数字标签。
+                    IPv4 地址由四个 0-255 的数字组成，用点分隔，例如 192.168.1.1。
+                </p>
+                
+                <h6>什么是子网掩码</h6>
+                <p>
+                    子网掩码用于确定 IP 地址的网络部分和主机部分。它决定了网络的大小和可容纳的主机数量。
+                    常见的表示方法有 CIDR 表示法（如 /24）和点分十进制表示法（如 255.255.255.0）。
+                </p>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>输入有效的 IPv4 地址</li>
+                    <li>选择或输入子网掩码</li>
+                    <li>点击"计算网络信息"按钮</li>
+                    <li>查看计算得到的网络信息和子网详情</li>
+                </ol>
+                
+                <h6>常见子网掩码对照表</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>CIDR</th>
+                                <th>子网掩码</th>
+                                <th>主机数</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/24</td>
+                                <td>255.255.255.0</td>
+                                <td>254</td>
+                            </tr>
+                            <tr>
+                                <td>/16</td>
+                                <td>255.255.0.0</td>
+                                <td>65,534</td>
+                            </tr>
+                            <tr>
+                                <td>/8</td>
+                                <td>255.0.0.0</td>
+                                <td>16,777,214</td>
+                            </tr>
+                            <tr>
+                                <td>/28</td>
+                                <td>255.255.255.240</td>
+                                <td>14</td>
+                            </tr>
+                            <tr>
+                                <td>/30</td>
+                                <td>255.255.255.252</td>
+                                <td>2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ipCalcForm = document.getElementById('ipCalcForm');
+            const subnetMaskSelect = document.getElementById('subnetMask');
+            const customSubnetGroup = document.getElementById('customSubnetGroup');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resultSection = document.getElementById('resultSection');
+            const networkInfo = document.getElementById('networkInfo');
+            const subnetTableBody = document.getElementById('subnetTableBody');
+            
+            // 子网掩码选择变化事件
+            subnetMaskSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customSubnetGroup.classList.remove('d-none');
+                } else {
+                    customSubnetGroup.classList.add('d-none');
+                }
+            });
+            
+            // 计算网络信息
+            ipCalcForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const ipAddress = document.getElementById('ipAddress').value.trim();
+                let subnetValue = subnetMaskSelect.value;
+                
+                if (subnetValue === 'custom') {
+                    subnetValue = document.getElementById('customSubnet').value.trim();
+                }
+                
+                try {
+                    const result = calculateNetworkInfo(ipAddress, subnetValue);
+                    displayResults(result);
+                    resultSection.classList.remove('d-none');
+                } catch (error) {
+                    showToast('计算出错: ' + error.message, 'error');
+                }
+            });
+            
+            // IP 地址和子网掩码计算函数
+            function calculateNetworkInfo(ip, subnet) {
+                // 验证 IP 地址
+                const ipRegex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+                const ipMatch = ip.match(ipRegex);
+                
+                if (!ipMatch) {
+                    throw new Error('无效的 IP 地址格式');
+                }
+                
+                const ipParts = ipMatch.slice(1).map(Number);
+                for (let part of ipParts) {
+                    if (part < 0 || part > 255) {
+                        throw new Error('IP 地址中的每个部分必须在 0-255 之间');
+                    }
+                }
+                
+                // 处理子网掩码
+                let subnetMask;
+                let cidr;
+                
+                if (subnet.includes('.')) {
+                    // 点分十进制格式
+                    const subnetMatch = subnet.match(ipRegex);
+                    if (!subnetMatch) {
+                        throw new Error('无效的子网掩码格式');
+                    }
+                    
+                    const subnetParts = subnetMatch.slice(1).map(Number);
+                    for (let part of subnetParts) {
+                        if (part < 0 || part > 255) {
+                            throw new Error('子网掩码中的每个部分必须在 0-255 之间');
+                        }
+                    }
+                    
+                    subnetMask = subnetParts.join('.');
+                    cidr = subnetToCIDR(subnetMask);
+                } else {
+                    // CIDR 格式
+                    cidr = parseInt(subnet);
+                    if (isNaN(cidr) || cidr < 0 || cidr > 32) {
+                        throw new Error('CIDR 值必须在 0-32 之间');
+                    }
+                    subnetMask = cidrToSubnetMask(cidr);
+                }
+                
+                // 计算网络地址
+                const networkAddress = calculateNetworkAddress(ipParts, subnetMask.split('.').map(Number));
+                
+                // 计算广播地址
+                const broadcastAddress = calculateBroadcastAddress(networkAddress.split('.').map(Number), cidr);
+                
+                // 计算主机范围
+                const hostMin = calculateHostMin(networkAddress);
+                const hostMax = calculateHostMax(broadcastAddress);
+                
+                // 计算主机数量
+                const hostCount = Math.pow(2, 32 - cidr) - 2;
+                
+                // 判断地址类型
+                const addressType = getAddressType(ipParts);
+                
+                return {
+                    ipAddress: ip,
+                    subnetMask: subnetMask,
+                    cidr: cidr,
+                    networkAddress: networkAddress,
+                    broadcastAddress: broadcastAddress,
+                    hostMin: hostMin,
+                    hostMax: hostMax,
+                    hostCount: hostCount,
+                    addressType: addressType
+                };
+            }
+            
+            // CIDR 转子网掩码
+            function cidrToSubnetMask(cidr) {
+                let mask = [];
+                for (let i = 0; i < 4; i++) {
+                    let n = Math.min(cidr, 8);
+                    mask.push(256 - Math.pow(2, 8 - n));
+                    cidr -= n;
+                }
+                return mask.join('.');
+            }
+            
+            // 子网掩码转 CIDR
+            function subnetToCIDR(mask) {
+                const parts = mask.split('.').map(Number);
+                let cidr = 0;
+                for (let part of parts) {
+                    cidr += (part >>> 0).toString(2).split('1').length - 1;
+                }
+                return cidr;
+            }
+            
+            // 计算网络地址
+            function calculateNetworkAddress(ip, mask) {
+                let network = [];
+                for (let i = 0; i < 4; i++) {
+                    network.push(ip[i] & mask[i]);
+                }
+                return network.join('.');
+            }
+            
+            // 计算广播地址
+            function calculateBroadcastAddress(network, cidr) {
+                let broadcast = [...network];
+                let hostBits = 32 - cidr;
+                for (let i = 3; i >= 0; i--) {
+                    if (hostBits <= 0) break;
+                    let bits = Math.min(hostBits, 8);
+                    broadcast[i] |= (1 << bits) - 1;
+                    hostBits -= bits;
+                }
+                return broadcast.join('.');
+            }
+            
+            // 计算最小主机地址
+            function calculateHostMin(network) {
+                const parts = network.split('.').map(Number);
+                parts[3] += 1; // 主机地址从网络地址+1开始
+                return parts.join('.');
+            }
+            
+            // 计算最大主机地址
+            function calculateHostMax(broadcast) {
+                const parts = broadcast.split('.').map(Number);
+                parts[3] -= 1; // 主机地址在广播地址-1结束
+                return parts.join('.');
+            }
+            
+            // 获取地址类型
+            function getAddressType(ip) {
+                const [first] = ip;
+                
+                if (first >= 1 && first <= 126) {
+                    return 'A 类地址';
+                } else if (first >= 128 && first <= 191) {
+                    return 'B 类地址';
+                } else if (first >= 192 && first <= 223) {
+                    return 'C 类地址';
+                } else if (first >= 224 && first <= 239) {
+                    return 'D 类地址 (组播)';
+                } else if (first >= 240 && first <= 255) {
+                    return 'E 类地址 (实验用)';
+                } else if (first === 127) {
+                    return '回环地址';
+                }
+                
+                return '未知类型';
+            }
+            
+            // 显示结果
+            function displayResults(result) {
+                // 显示网络信息
+                networkInfo.textContent = `IP 地址: ${result.ipAddress}\n` +
+                                         `子网掩码: ${result.subnetMask}\n` +
+                                         `CIDR: /${result.cidr}\n` +
+                                         `网络地址: ${result.networkAddress}\n` +
+                                         `广播地址: ${result.broadcastAddress}\n` +
+                                         `地址类型: ${result.addressType}`;
+                
+                // 显示子网表格
+                subnetTableBody.innerHTML = `
+                    <tr>
+                        <td>IP 地址</td>
+                        <td>${result.ipAddress}</td>
+                    </tr>
+                    <tr>
+                        <td>子网掩码</td>
+                        <td>${result.subnetMask}</td>
+                    </tr>
+                    <tr>
+                        <td>CIDR</td>
+                        <td>/${result.cidr}</td>
+                    </tr>
+                    <tr>
+                        <td>网络地址</td>
+                        <td>${result.networkAddress}</td>
+                    </tr>
+                    <tr>
+                        <td>广播地址</td>
+                        <td>${result.broadcastAddress}</td>
+                    </tr>
+                    <tr>
+                        <td>可用主机范围</td>
+                        <td>${result.hostMin} - ${result.hostMax}</td>
+                    </tr>
+                    <tr>
+                        <td>可用主机数</td>
+                        <td>${result.hostCount.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <td>地址类型</td>
+                        <td>${result.addressType}</td>
+                    </tr>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

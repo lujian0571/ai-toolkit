@@ -125,6 +125,12 @@ const navbarConfig = {
                     url: PATH_PREFIX + "/data/converter/index.html"
                 },
                 {
+                    name: "网络和IP地址计算器",
+                    icon: "bi-hdd-network",
+                    description: "计算IP地址相关信息，如网络地址、广播地址、可用主机范围等",
+                    url: PATH_PREFIX + "/data/ip-calculator/index.html"
+                },
+                {
                     name: "颜色值转换",
                     icon: "bi-palette",
                     description: "RGB/HSL/HEX 颜色值互相转换",
