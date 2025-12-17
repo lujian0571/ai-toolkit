@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代码格式化工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/highlightjs-line-numbers.js@2.9.0/dist/highlightjs-line-numbers.min.css">
+    <style>
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .editor-header {
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        .editor-body {
+            padding: 0;
+        }
+        textarea, pre {
+            border: none;
+            resize: vertical;
+            min-height: 400px;
+            max-height: 600px;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 1rem;
+            overflow: auto;
+        }
+        textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border-radius: 0;
+            border: none;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .hljs-ln-numbers {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+            text-align: right;
+            color: #ccc;
+            vertical-align: top;
+            padding-right: 10px !important;
+        }
+        .hljs-ln-code {
+            padding-left: 10px !important;
+        }
+        
+        /* 全屏模式样式 */
+        .fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background-color: white;
+            border: none;
+            border-radius: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .fullscreen .editor-header {
+            background-color: #e9ecef;
+            padding: 0.75rem 1rem;
+        }
+        
+        .fullscreen .editor-body {
+            height: calc(100% - 56px);
+        }
+        
+        .fullscreen pre {
+            height: 100%;
+            max-height: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">开发工具</li>
+                <li class="breadcrumb-item active" aria-current="page">代码格式化工具</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">代码格式化工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="languageSelect" class="form-label">编程语言</label>
+                        <select class="form-select" id="languageSelect">
+                            <option value="javascript">JavaScript</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="json">JSON</option>
+                            <option value="xml">XML</option>
+                            <option value="sql">SQL</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="indentSize" class="form-label">缩进大小</label>
+                        <select class="form-select" id="indentSize">
+                            <option value="2">2个空格</option>
+                            <option value="4" selected>4个空格</option>
+                            <option value="8">8个空格</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="editor-container">
+                            <div class="editor-header d-flex justify-content-between align-items-center">
+                                <span>输入代码</span>
+                            </div>
+                            <div class="editor-body">
+                                <textarea rows="10" class="form-control" id="inputCode" placeholder="在此输入需要格式化的代码"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="editor-container">
+                            <div class="editor-header d-flex justify-content-between align-items-center">
+                                <span>格式化结果</span>
+                                <button id="fullscreenBtn" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                            </div>
+                            <div class="editor-body">
+                                <pre><code id="outputCode">格式化后的代码将显示在这里</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <button id="formatBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-magic me-1"></i>
+                            格式化代码
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger me-2">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于代码格式化</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是代码格式化</h6>
+                <p>
+                    代码格式化是指对源代码进行排版和美化，使其更易读、更规范的过程。
+                    通过统一的缩进、空格、换行等规则，可以让代码结构更清晰，便于团队协作和后期维护。
+                </p>
+                
+                <h6>支持的编程语言</h6>
+                <ul>
+                    <li><strong>JavaScript：</strong>Web前端开发的主要编程语言</li>
+                    <li><strong>HTML：</strong>用于创建网页结构的标记语言</li>
+                    <li><strong>CSS：</strong>用于描述网页外观的样式表语言</li>
+                    <li><strong>JSON：</strong>轻量级的数据交换格式</li>
+                    <li><strong>XML：</strong>可扩展标记语言，用于存储和传输数据</li>
+                    <li><strong>SQL：</strong>结构化查询语言，用于管理关系数据库</li>
+                    <li><strong>Python：</strong>高级编程语言，以简洁和可读性强著称</li>
+                    <li><strong>Java：</strong>面向对象的编程语言，广泛用于企业级开发</li>
+                    <li><strong>C++：</strong>中级编程语言，性能高，功能强大</li>
+                    <li><strong>C#：</strong>微软开发的面向对象编程语言</li>
+                    <li><strong>PHP：</strong>服务器端脚本语言，主要用于Web开发</li>
+                    <li><strong>Ruby：</strong>简洁优雅的脚本语言</li>
+                    <li><strong>Go：</strong>谷歌开发的编程语言，以高效和简洁著称</li>
+                    <li><strong>Rust：</strong>系统编程语言，注重安全性和性能</li>
+                </ul>
+                
+                <h6>格式化选项</h6>
+                <ul>
+                    <li><strong>缩进大小：</strong>可选择2个、4个或8个空格作为缩进单位</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>改善代码可读性</li>
+                    <li>统一团队代码风格</li>
+                    <li>减少代码审查时的格式争议</li>
+                    <li>提高代码维护效率</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>选择需要格式化的编程语言</li>
+                    <li>选择合适的缩进大小</li>
+                    <li>在左侧输入框中粘贴需要格式化的代码</li>
+                    <li>点击"格式化代码"按钮</li>
+                    <li>在右侧查看格式化后的结果</li>
+                    <li>使用"复制结果"按钮将格式化后的代码复制到剪贴板</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                    <li>对于复杂或大型代码，格式化可能需要一些时间</li>
+                    <li>确保输入的代码语法正确，以获得最佳格式化效果</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/standalone.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-babel.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-html.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-postcss.js"></script>
+    <script src="https://unpkg.com/prettier@2.8.8/parser-markdown.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/javascript.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/html.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/css.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/json.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/xml.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/sql.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/python.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/java.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/cpp.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/csharp.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/php.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/ruby.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/go.min.js"></script>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/es/languages/rust.min.js"></script>
+    <script>
+        // 等待 hljs 完全加载后再加载行号插件
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof hljs !== 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/highlightjs-line-numbers.js@2.9.0/dist/highlightjs-line-numbers.min.js';
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputCode = document.getElementById('inputCode');
+            const outputCode = document.getElementById('outputCode');
+            const languageSelect = document.getElementById('languageSelect');
+            const indentSize = document.getElementById('indentSize');
+            
+            // 应用代码高亮
+            function applyHighlight() {
+                // 确保 hljs 已经加载
+                if (typeof hljs !== 'undefined') {
+                    // // 清除之前的高亮
+                    // outputCode.className = 'hljs language-' + languageSelect.value;
+                    // // 应用高亮
+                    // hljs.highlightElement(outputCode);
+                    document.querySelectorAll('pre code').forEach((el) => {
+                        hljs.highlightElement(el);
+                    });
+                    // 添加行号
+                    if (typeof hljs.lineNumbersBlock !== 'undefined') {
+                        hljs.lineNumbersBlock(outputCode);
+                    }
+                }
+            }
+            
+            // 格式化代码
+            document.getElementById('formatBtn').addEventListener('click', function() {
+                try {
+                    const code = inputCode.value;
+                    const language = languageSelect.value;
+                    const tabWidth = parseInt(indentSize.value);
+                    
+                    if (!code) {
+                        showToast('请输入需要格式化的代码', 'error');
+                        return;
+                    }
+                    
+                    // 根据语言选择对应的解析器
+                    let parser = 'babel'; // 默认使用 babel 解析器
+                    switch(language) {
+                        case 'javascript':
+                            parser = 'babel';
+                            break;
+                        case 'html':
+                            parser = 'html';
+                            break;
+                        case 'css':
+                            parser = 'css';
+                            break;
+                        case 'json':
+                            parser = 'json';
+                            break;
+                        case 'xml':
+                            parser = 'html'; // XML 可以使用 HTML 解析器
+                            break;
+                    }
+                    
+                    // 使用 Prettier 格式化代码
+                    const formatted = prettier.format(code, {
+                        parser: parser,
+                        plugins: [prettierPlugins.babel, prettierPlugins.html, prettierPlugins.postcss],
+                        tabWidth: tabWidth,
+                        useTabs: false,
+                        semi: true,
+                        singleQuote: true
+                    });
+                    
+                    // 显示格式化后的代码并应用语法高亮和行号
+                    outputCode.textContent = formatted;
+                    
+                    // 应用高亮和行号
+                    setTimeout(applyHighlight, 100);
+                } catch (e) {
+                    showToast('格式化出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputCode.value = '';
+                outputCode.textContent = '格式化后的代码将显示在这里';
+            });
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputCode.value;
+                inputCode.value = outputCode.textContent;
+                outputCode.textContent = temp;
+            });
+            
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputCode.textContent);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+            
+            // 全屏切换功能
+            let isFullscreen = false;
+            const editorContainer = document.querySelector('.col-md-6:nth-child(2) .editor-container');
+            
+            document.getElementById('fullscreenBtn').addEventListener('click', function() {
+                if (!isFullscreen) {
+                    // 进入全屏
+                    editorContainer.classList.add('fullscreen');
+                    document.getElementById('fullscreenBtn').innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+                    isFullscreen = true;
+                } else {
+                    // 退出全屏
+                    editorContainer.classList.remove('fullscreen');
+                    document.getElementById('fullscreenBtn').innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+                    isFullscreen = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

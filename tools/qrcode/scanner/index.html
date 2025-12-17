@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码识别器 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">二维码</li>
+                <li class="breadcrumb-item active" aria-current="page">二维码识别</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">二维码识别</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="imageUpload" class="form-label">上传/拖拽/粘贴二维码图片</label>
+                            <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div id="dropArea" class="border rounded p-4 text-center bg-light"
+                                 style="border: 2px dashed #ccc !important; cursor: pointer;" tabindex="0">
+                                <i class="bi bi-cloud-upload fs-1"></i>
+                                <p class="mt-2 mb-0">将二维码图片拖拽到这里</p>
+                                <p class="mt-1 mb-0">或点击选择文件</p>
+                                <p class="mt-1 mb-0">或按下 Ctrl+V 粘贴图片</p>
+                                <p class="text-muted small mt-2 mb-0">支持 JPG、PNG 格式</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">识别结果</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultArea">
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-qr-code-scan fs-1"></i>
+                                <p class="mt-2 mb-0">请上传或拖拽二维码图片进行识别</p>
+                            </div>
+                        </div>
+                        
+                        <div id="resultText" class="mt-3" style="display: none;">
+                            <label class="form-label">识别内容</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="decodedText" readonly>
+                                <button class="btn btn-outline-secondary" type="button" id="copyBtn">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 文件上传事件
+            document.getElementById('imageUpload').addEventListener('change', handleFileUpload);
+            
+            // 拖拽事件
+            const dropArea = document.getElementById('dropArea');
+            dropArea.addEventListener('dragover', handleDragOver);
+            dropArea.addEventListener('drop', handleDrop);
+            dropArea.addEventListener('click', function() {
+                document.getElementById('imageUpload').click();
+            });
+            
+            // 粘贴事件
+            document.addEventListener('paste', handlePaste);
+            
+            // 复制按钮事件
+            document.getElementById('copyBtn').addEventListener('click', copyToClipboard);
+        }
+        
+        // 处理文件上传
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImageFile(file);
+            }
+        }
+        
+        // 处理拖拽
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.classList.add('bg-primary', 'text-white');
+            this.classList.remove('bg-light');
+        }
+        
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // 恢复样式
+            this.classList.remove('bg-primary', 'text-white');
+            this.classList.add('bg-light');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    processImageFile(file);
+                } else {
+                    showToast('请选择图片文件', 'warning');
+                }
+            }
+        }
+        
+        // 处理粘贴
+        function handlePaste(event) {
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    processImageFile(file);
+                    return;
+                }
+            }
+            showToast('剪贴板中没有图片', 'warning');
+        }
+        
+        // 处理图像文件
+        function processImageFile(file) {
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showToast('请选择图片文件', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    decodeQRCode(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 解码二维码
+        function decodeQRCode(img) {
+            try {
+                // 创建canvas用于处理图像
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // 设置canvas尺寸与图像一致
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                // 在canvas上绘制图像
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                
+                // 获取图像数据
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // 使用jsQR解码
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+                
+                // 显示结果
+                const resultArea = document.getElementById('resultArea');
+                const resultText = document.getElementById('resultText');
+                const decodedTextInput = document.getElementById('decodedText');
+                
+                if (code) {
+                    // 显示识别成功的图像和结果
+                    resultArea.innerHTML = `
+                        <div class="text-center">
+                            <img src="${img.src}" class="img-fluid" style="max-height: 200px;">
+                            <div class="mt-2 text-success">
+                                <i class="bi bi-check-circle-fill"></i> 识别成功
+                            </div>
+                        </div>
+                    `;
+                    
+                    decodedTextInput.value = code.data;
+                    resultText.style.display = 'block';
+                    showToast('二维码识别成功', 'success');
+                } else {
+                    // 显示识别失败的结果
+                    resultArea.innerHTML = `
+                        <div class="text-center">
+                            <img src="${img.src}" class="img-fluid" style="max-height: 200px;">
+                            <div class="mt-2 text-danger">
+                                <i class="bi bi-x-circle-fill"></i> 未识别到二维码
+                            </div>
+                        </div>
+                    `;
+                    resultText.style.display = 'none';
+                    showToast('未能识别到二维码，请确保图片清晰且包含有效的二维码', 'warning');
+                }
+            } catch (error) {
+                showToast('识别过程出错: ' + error.message, 'error');
+            }
+        }
+        
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const text = document.getElementById('decodedText').value;
+            if (text) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast('已复制到剪贴板', 'success');
+                }, function() {
+                    showToast('复制失败', 'error');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

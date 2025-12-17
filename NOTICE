@@ -1,0 +1,44 @@
+AI Toolkit
+Copyright 2025 lujian0571
+
+This project is licensed under the Apache License, Version 2.0.
+
+This project also uses the following third-party components:
+
+Bootstrap
+Licensed under the MIT License
+https://github.com/twbs/bootstrap
+
+Bootstrap Icons
+Licensed under the MIT License
+https://github.com/twbs/icons
+
+Crypto-JS
+Licensed under the MIT License
+https://github.com/brix/crypto-js
+
+JSEncrypt
+Licensed under the MIT License
+https://github.com/travist/jsencrypt
+
+jsQR
+Licensed under the Apache License, Version 2.0
+https://github.com/cozmo/jsQR
+
+Day.js
+Licensed under the MIT License
+https://github.com/iamkun/dayjs
+
+ prettier
+Licensed under the MIT License
+https://github.com/prettier/prettier
+
+diff-match-patch
+Licensed under the Apache License, Version 2.0
+https://github.com/google/diff-match-patch
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本差异比较工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .editor-header {
+            background-color: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        .editor-body {
+            padding: 0;
+        }
+        textarea {
+            border: none;
+            resize: vertical;
+            min-height: 200px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .diff-container {
+            border: 1px solid #ddd;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .diff-line {
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            padding: 0.1rem 0.5rem;
+            line-height: 1.5;
+        }
+        .diff-line-added {
+            background-color: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+        .diff-line-removed {
+            background-color: #f8d7da;
+            border-left: 3px solid #dc3545;
+        }
+        .diff-line-unchanged {
+            background-color: #f8f9fa;
+        }
+        .diff-line-empty {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">开发工具</li>
+                <li class="breadcrumb-item active" aria-current="page">文本差异比较工具</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">文本差异比较工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="editor-container">
+                            <div class="editor-header">原文本</div>
+                            <div class="editor-body">
+                                <textarea class="form-control" id="originalText" placeholder="在此输入原文本"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="editor-container">
+                            <div class="editor-header">对比文本</div>
+                            <div class="editor-body">
+                                <textarea class="form-control" id="compareText" placeholder="在此输入需要对比的文本"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="compareBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-layout-split me-1"></i>
+                            比较差异
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger me-2">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="resultsSection" style="display: none;">
+                    <div class="diff-container">
+                        <div class="editor-header">差异结果</div>
+                        <div class="editor-body">
+                            <div id="diffResult"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于文本差异比较</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是文本差异比较</h6>
+                <p>
+                    文本差异比较是一种用于识别两个文本之间差异的技术。
+                    通过逐行比较两个文本文件，可以清晰地看到哪些行被添加、删除或修改。
+                    这种技术广泛应用于版本控制系统、代码审查和文档修订等场景。
+                </p>
+                
+                <h6>差异标识说明</h6>
+                <ul>
+                    <li><strong style="color: #28a745;">绿色背景 + 左侧绿线：</strong>新增的行</li>
+                    <li><strong style="color: #dc3545;">红色背景 + 左侧红线：</strong>删除的行</li>
+                    <li><strong>灰色背景：</strong>未发生变化的行</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>代码版本对比</li>
+                    <li>文档修订审查</li>
+                    <li>配置文件变更分析</li>
+                    <li>数据一致性检查</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>在左侧输入框中粘贴原文本</li>
+                    <li>在右侧输入框中粘贴需要对比的文本</li>
+                    <li>点击"比较差异"按钮</li>
+                    <li>在下方查看差异结果</li>
+                    <li>使用"交换内容"按钮可以交换两个输入框的内容</li>
+                    <li>使用"清空"按钮可以清除所有内容</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                    <li>对于大型文本，比较可能需要一些时间</li>
+                    <li>差异比较基于行进行，每行的变更都会单独标识</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/diff@5.1.0/dist/diff.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const originalText = document.getElementById('originalText');
+            const compareText = document.getElementById('compareText');
+            const diffResult = document.getElementById('diffResult');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // 比较差异
+            document.getElementById('compareBtn').addEventListener('click', function() {
+                try {
+                    const original = originalText.value;
+                    const compare = compareText.value;
+                    
+                    if (!original && !compare) {
+                        showToast('请至少在一个输入框中输入文本', 'error');
+                        return;
+                    }
+                    
+                    // 使用 diff 库计算差异
+                    const diff = Diff.diffLines(original, compare);
+                    
+                    // 显示差异结果
+                    displayDiff(diff);
+                    
+                    // 显示结果区域
+                    resultsSection.style.display = 'block';
+                    
+                    // 滚动到结果区域
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                } catch (e) {
+                    showToast('比较出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                originalText.value = '';
+                compareText.value = '';
+                resultsSection.style.display = 'none';
+            });
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = originalText.value;
+                originalText.value = compareText.value;
+                compareText.value = temp;
+            });
+            
+            // 显示差异结果
+            function displayDiff(diff) {
+                diffResult.innerHTML = '';
+                
+                diff.forEach(part => {
+                    const lines = part.value.split('\n');
+                    // 移除最后一个空行（如果存在）
+                    if (lines.length > 0 && lines[lines.length - 1] === '') {
+                        lines.pop();
+                    }
+                    
+                    lines.forEach(line => {
+                        const div = document.createElement('div');
+                        div.className = 'diff-line';
+                        
+                        if (part.added) {
+                            div.classList.add('diff-line-added');
+                            div.textContent = '+' + line;
+                        } else if (part.removed) {
+                            div.classList.add('diff-line-removed');
+                            div.textContent = '-' + line;
+                        } else {
+                            div.classList.add('diff-line-unchanged');
+                            div.textContent = ' ' + line;
+                        }
+                        
+                        diffResult.appendChild(div);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

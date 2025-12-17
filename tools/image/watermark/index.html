@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加水印 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <style>
+        .preview-container {
+            max-width: 100%;
+            overflow: auto;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            margin: 0 auto;
+        }
+        .watermark-settings {
+            display: none;
+        }
+        #textWatermarkSettings {
+            display: block;
+        }
+        .preview-placeholder {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 4px;
+            color: #6c757d;
+        }
+        .coordinate-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .coordinate-input {
+            flex: 1;
+        }
+        .quick-position-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .quick-position-buttons .btn {
+            flex: 1;
+            min-width: 70px;
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">图片处理</li>
+                <li class="breadcrumb-item">添加水印</li>
+                <li class="breadcrumb-item active" aria-current="page">水印</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">图片上传与水印设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="imageUpload" class="form-label">选择图片</label>
+                            <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                        </div>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill"></i> 支持 JPG、PNG、WebP 等常见图片格式
+                        </div>
+                        
+                        <!-- 使用分割线将上传和设置分开 -->
+                        <div class="d-flex align-items-center my-4">
+                          <div class="flex-grow-1 border-top"></div>
+                          <span class="mx-3 text-muted">
+                            <i class="bi bi-gear-fill me-1"></i>
+                            水印设置
+                          </span>
+                          <div class="flex-grow-1 border-top"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="mb-3">
+                                <label for="watermarkType" class="form-label">水印类型</label>
+                                <select class="form-select" id="watermarkType">
+                                    <option value="text" selected>文字水印</option>
+                                    <option value="image">图片水印</option>
+                                </select>
+                            </div>
+                            
+                            <div class="watermark-settings" id="textWatermarkSettings">
+                                <div class="mb-3">
+                                    <label for="watermarkText" class="form-label">水印文字</label>
+                                    <input type="text" class="form-control" id="watermarkText" value="水印文字">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="fontSize" class="form-label">字体大小: <span id="fontSizeValue">24</span>px</label>
+                                    <input type="range" class="form-range" id="fontSize" min="12" max="72" value="24">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="fontColor" class="form-label">字体颜色</label>
+                                    <input type="color" class="form-control form-control-color" id="fontColor" value="#ffffff">
+                                </div>
+                            </div>
+                            
+                            <div class="watermark-settings" id="imageWatermarkSettings">
+                                <div class="mb-3">
+                                    <label for="watermarkImage" class="form-label">选择水印图片</label>
+                                    <input class="form-control" type="file" id="watermarkImage" accept="image/*">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="watermarkScale" class="form-label">水印缩放比例: <span id="scaleValue">100</span>%</label>
+                                    <input type="range" class="form-range" id="watermarkScale" min="1" max="200" value="100">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">水印位置</label>
+                                <div class="coordinate-inputs">
+                                    <div class="coordinate-input">
+                                        <label for="positionX" class="form-label">X 坐标</label>
+                                        <input type="number" class="form-control" id="positionX" min="0" value="10">
+                                    </div>
+                                    <div class="coordinate-input">
+                                        <label for="positionY" class="form-label">Y 坐标</label>
+                                        <input type="number" class="form-control" id="positionY" min="0" value="10">
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-position-buttons">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-position="top-left">左上角</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-position="top-right">右上角</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-position="bottom-left">左下角</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-position="bottom-right">右下角</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" data-position="center">居中</button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="watermarkOpacity" class="form-label">透明度: <span id="opacityValue">50</span>%</label>
+                                <input type="range" class="form-range" id="watermarkOpacity" min="1" max="100" value="50">
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="applyWatermarkBtn" disabled>
+                            <i class="bi bi-water me-1"></i>
+                            添加水印
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">预览</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-container">
+                            <div id="imagePreviewPlaceholder" class="preview-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                            <canvas id="imagePreview" class="image-preview d-none"></canvas>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="downloadBtn" disabled>
+                                    <i class="bi bi-download me-1"></i>
+                                    下载带水印的图片
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 全局变量
+        let originalImage = null;
+        let watermarkImage = null;
+        let watermarkedImageBlob = null;
+        let originalFileName = '';
+        let isProcessing = false; // 防止频繁触发处理
+        let isDragging = false; // 是否正在拖动水印
+        let dragOffsetX = 0; // 拖动偏移X
+        let dragOffsetY = 0; // 拖动偏移Y
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            // 文件上传事件
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // 水印图片上传事件
+            document.getElementById('watermarkImage').addEventListener('change', handleWatermarkImageUpload);
+
+            // 水印缩放比例滑块事件
+            document.getElementById('watermarkScale').addEventListener('input', function() {
+                document.getElementById('scaleValue').textContent = this.value;
+                // 实时添加水印
+                applyWatermark(false);
+            });
+
+            // 添加水印按钮事件
+            document.getElementById('applyWatermarkBtn').addEventListener('click', function() {
+                applyWatermark(true); // 手动点击按钮时强制更新
+            });
+            
+            // 下载按钮事件
+            document.getElementById('downloadBtn').addEventListener('click', downloadWatermarkedImage);
+            
+            // 水印类型选择事件
+            document.getElementById('watermarkType').addEventListener('change', function() {
+                const textSettings = document.getElementById('textWatermarkSettings');
+                const imageSettings = document.getElementById('imageWatermarkSettings');
+                
+                if (this.value === 'text') {
+                    textSettings.style.display = 'block';
+                    imageSettings.style.display = 'none';
+                } else {
+                    textSettings.style.display = 'none';
+                    imageSettings.style.display = 'block';
+                    // 重置水印缩放比例为100%
+                    document.getElementById('watermarkScale').value = 100;
+                    document.getElementById('scaleValue').textContent = '100';
+                }
+                // 实时添加水印
+                applyWatermark(false);
+            });
+
+            // 文字水印输入事件
+            document.getElementById('watermarkText').addEventListener('input', function() {
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // 字体大小滑块事件
+            document.getElementById('fontSize').addEventListener('input', function() {
+                document.getElementById('fontSizeValue').textContent = this.value;
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // 字体颜色选择事件
+            document.getElementById('fontColor').addEventListener('input', function() {
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // X坐标输入事件
+            document.getElementById('positionX').addEventListener('input', function() {
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // Y坐标输入事件
+            document.getElementById('positionY').addEventListener('input', function() {
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // 透明度滑块事件
+            document.getElementById('watermarkOpacity').addEventListener('input', function() {
+                document.getElementById('opacityValue').textContent = this.value;
+                // 实时添加水印
+                applyWatermark(false);
+            });
+            
+            // 快捷位置按钮事件
+            document.querySelectorAll('.quick-position-buttons .btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    setPositionByPreset(this.dataset.position);
+                });
+            });
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 获取原始文件名（不含扩展名）
+            const fileName = file.name;
+            const lastDotIndex = fileName.lastIndexOf('.');
+            originalFileName = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showToast('请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    // 显示原始图片
+                    drawImageOnCanvas();
+                    
+                    const previewCanvas = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    previewCanvas.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 启用添加水印按钮
+                    document.getElementById('applyWatermarkBtn').disabled = false;
+                    
+                    // 实时添加水印
+                    applyWatermark(false);
+                    
+                    showToast('图片上传成功', 'success');
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 处理水印图片上传
+        function handleWatermarkImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showToast('请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                watermarkImage = new Image();
+                watermarkImage.onload = function() {
+                    showToast('水印图片上传成功', 'success');
+                    // 实时添加水印
+                    applyWatermark(false);
+                };
+                watermarkImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 在画布上绘制图片
+        function drawImageOnCanvas() {
+            if (!originalImage) return;
+            
+            const canvas = document.getElementById('imagePreview');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置画布尺寸
+            canvas.width = originalImage.width;
+            canvas.height = originalImage.height;
+            
+            // 绘制原始图片
+            ctx.drawImage(originalImage, 0, 0);
+            
+            // 为画布添加鼠标事件监听器，支持拖动水印
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', drag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
+        }
+
+        // 根据预设位置设置坐标
+        function setPositionByPreset(position) {
+            if (!originalImage) return;
+            
+            let x = 10, y = 10;
+            
+            // 计算水印尺寸（最大不超过原图的1/4）
+            let watermarkWidth, watermarkHeight;
+
+            if (document.getElementById('watermarkType').value === 'text') {
+                // 文字水印
+                const text = document.getElementById('watermarkText').value;
+                const fontSize = document.getElementById('fontSize').value;
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.font = fontSize + 'px Arial';
+                const textMetrics = ctx.measureText(text);
+                watermarkWidth = textMetrics.width;
+                watermarkHeight = parseInt(fontSize);
+            } else {
+                // 图片水印
+                if (!watermarkImage) return;
+                
+                // 获取水印缩放比例（最大允许放大2倍，即200%）
+                const scalePercent = parseInt(document.getElementById('watermarkScale').value) || 100;
+                watermarkWidth = watermarkImage.width * (scalePercent / 100);
+                watermarkHeight = watermarkImage.height * (scalePercent / 100);
+                
+                // 设置合理的最大尺寸限制，避免水印过大影响视觉效果
+                // 最大不超过原图的80%
+                const maxAllowedWidth = originalImage.width * 0.8;
+                const maxAllowedHeight = originalImage.height * 0.8;
+                
+                // 只有当水印尺寸超过最大允许尺寸时才进行缩放调整
+                if (watermarkWidth > maxAllowedWidth) {
+                    const scale = maxAllowedWidth / watermarkWidth;
+                    watermarkWidth = maxAllowedWidth;
+                    watermarkHeight *= scale;
+                }
+                
+                if (watermarkHeight > maxAllowedHeight) {
+                    const scale = maxAllowedHeight / watermarkHeight;
+                    watermarkHeight = maxAllowedHeight;
+                    watermarkWidth *= scale;
+                }
+                
+                // 确保水印尺寸不小于1像素
+                watermarkWidth = Math.max(watermarkWidth, 1);
+                watermarkHeight = Math.max(watermarkHeight, 1);
+            }
+            
+            // 根据预设位置计算坐标
+            switch (position) {
+                case 'top-left':
+                    x = 10;
+                    y = 10;
+                    break;
+                case 'top-right':
+                    x = originalImage.width - watermarkWidth - 10;
+                    y = 10;
+                    break;
+                case 'bottom-left':
+                    x = 10;
+                    y = originalImage.height - watermarkHeight - 10;
+                    break;
+                case 'bottom-right':
+                    x = originalImage.width - watermarkWidth - 10;
+                    y = originalImage.height - watermarkHeight - 10;
+                    break;
+                case 'center':
+                    x = (originalImage.width - watermarkWidth) / 2;
+                    y = (originalImage.height - watermarkHeight) / 2;
+                    break;
+            }
+            
+            // 设置坐标输入框的值
+            document.getElementById('positionX').value = Math.round(x);
+            document.getElementById('positionY').value = Math.round(y);
+            
+            // 添加一个小延迟，确保坐标值已更新后再应用水印
+            setTimeout(() => {
+                applyWatermark(false);
+            }, 0);
+            
+            // 实时添加水印
+            applyWatermark(false);
+        }
+
+        // 添加水印
+        function applyWatermark(forceUpdate = false) {
+            // 防止频繁触发处理
+            if (isProcessing && !forceUpdate) return;
+            
+            if (!originalImage) {
+                return;
+            }
+
+            const watermarkType = document.getElementById('watermarkType').value;
+            const x = parseInt(document.getElementById('positionX').value) || 0;
+            const y = parseInt(document.getElementById('positionY').value) || 0;
+            const opacity = parseInt(document.getElementById('watermarkOpacity').value) / 100;
+            
+            isProcessing = true;
+            
+            try {
+                const canvas = document.getElementById('imagePreview');
+                const ctx = canvas.getContext('2d');
+                
+                // 清除画布并重新绘制原始图片
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(originalImage, 0, 0);
+                
+                // 设置透明度
+                ctx.globalAlpha = opacity;
+                
+                if (watermarkType === 'text') {
+                    // 添加文字水印
+                    const text = document.getElementById('watermarkText').value;
+                    const fontSize = document.getElementById('fontSize').value;
+                    const fontColor = document.getElementById('fontColor').value;
+                    
+                    ctx.font = fontSize + 'px Arial';
+                    ctx.fillStyle = fontColor;
+                    ctx.textBaseline = 'top';
+                    
+                    ctx.fillText(text, x, y);
+                } else {
+                    // 添加图片水印
+                    if (!watermarkImage) {
+                        isProcessing = false;
+                        return;
+                    }
+                    
+                    // 获取水印缩放比例（最大允许放大2倍，即200%）
+                    const scalePercent = parseInt(document.getElementById('watermarkScale').value) || 100;
+                    let watermarkWidth = watermarkImage.width * (scalePercent / 100);
+                    let watermarkHeight = watermarkImage.height * (scalePercent / 100);
+                    
+                    // 设置合理的最大尺寸限制，避免水印过大影响视觉效果
+                    // 最大不超过原图的80%
+                    const maxAllowedWidth = canvas.width * 0.8;
+                    const maxAllowedHeight = canvas.height * 0.8;
+                    
+                    // 只有当水印尺寸超过最大允许尺寸时才进行缩放调整
+                    if (watermarkWidth > maxAllowedWidth) {
+                        const scale = maxAllowedWidth / watermarkWidth;
+                        watermarkWidth = maxAllowedWidth;
+                        watermarkHeight *= scale;
+                    }
+                    
+                    if (watermarkHeight > maxAllowedHeight) {
+                        const scale = maxAllowedHeight / watermarkHeight;
+                        watermarkHeight = maxAllowedHeight;
+                        watermarkWidth *= scale;
+                    }
+                    
+                    // 确保水印尺寸不小于1像素
+                    watermarkWidth = Math.max(watermarkWidth, 1);
+                    watermarkHeight = Math.max(watermarkHeight, 1);
+                    
+                    ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
+                }
+                
+                // 重置透明度
+                ctx.globalAlpha = 1.0;
+                
+                // 转换为blob并保存
+                canvas.toBlob(function(blob) {
+                    watermarkedImageBlob = blob;
+                    
+                    // 启用下载按钮
+                    document.getElementById('downloadBtn').disabled = false;
+                    
+                    isProcessing = false;
+                    
+                    if (forceUpdate) {
+                        showToast('水印添加完成', 'success');
+                    }
+                }, 'image/png');
+            } catch (error) {
+                isProcessing = false;
+                if (forceUpdate) {
+                    showToast('添加水印失败: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // 下载带水印的图片
+        function downloadWatermarkedImage() {
+            if (!watermarkedImageBlob) {
+                showToast('没有可下载的图片', 'error');
+                return;
+            }
+
+            const fileName = originalFileName + '-watermarked.png';
+            const url = URL.createObjectURL(watermarkedImageBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            showToast('图片下载完成', 'success');
+        }
+
+        // 开始拖动
+        function startDrag(e) {
+            if (!watermarkImage && document.getElementById('watermarkType').value !== 'text') return;
+            if (!originalImage) return;
+            
+            const canvas = document.getElementById('imagePreview');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 获取当前水印位置和尺寸
+            const watermarkX = parseInt(document.getElementById('positionX').value) || 0;
+            const watermarkY = parseInt(document.getElementById('positionY').value) || 0;
+            
+            let watermarkWidth, watermarkHeight;
+            if (document.getElementById('watermarkType').value === 'text') {
+                // 文字水印尺寸计算
+                const text = document.getElementById('watermarkText').value;
+                const fontSize = document.getElementById('fontSize').value;
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.font = fontSize + 'px Arial';
+                const textMetrics = tempCtx.measureText(text);
+                watermarkWidth = textMetrics.width;
+                watermarkHeight = parseInt(fontSize);
+            } else {
+                // 图片水印尺寸计算
+                const scalePercent = parseInt(document.getElementById('watermarkScale').value) || 100;
+                watermarkWidth = watermarkImage.width * (scalePercent / 100);
+                watermarkHeight = watermarkImage.height * (scalePercent / 100);
+                
+                // 应用最大尺寸限制
+                const maxAllowedWidth = canvas.width * 0.8;
+                const maxAllowedHeight = canvas.height * 0.8;
+                
+                if (watermarkWidth > maxAllowedWidth) {
+                    const scale = maxAllowedWidth / watermarkWidth;
+                    watermarkWidth = maxAllowedWidth;
+                    watermarkHeight *= scale;
+                }
+                
+                if (watermarkHeight > maxAllowedHeight) {
+                    const scale = maxAllowedHeight / watermarkHeight;
+                    watermarkHeight = maxAllowedHeight;
+                    watermarkWidth *= scale;
+                }
+                
+                watermarkWidth = Math.max(watermarkWidth, 1);
+                watermarkHeight = Math.max(watermarkHeight, 1);
+            }
+            
+            // 检查点击是否在水印区域内
+            if (x >= watermarkX && x <= watermarkX + watermarkWidth &&
+                y >= watermarkY && y <= watermarkY + watermarkHeight) {
+                isDragging = true;
+                dragOffsetX = x - watermarkX;
+                dragOffsetY = y - watermarkY;
+            }
+        }
+
+        // 拖动过程中
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const canvas = document.getElementById('imagePreview');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 计算新的水印位置
+            const newX = x - dragOffsetX;
+            const newY = y - dragOffsetY;
+            
+            // 更新坐标输入框
+            document.getElementById('positionX').value = Math.max(0, Math.floor(newX));
+            document.getElementById('positionY').value = Math.max(0, Math.floor(newY));
+            
+            // 实时更新水印
+            applyWatermark(false);
+        }
+
+        // 结束拖动
+        function endDrag() {
+            isDragging = false;
+        }
+    </script>
+</body>
+</html>

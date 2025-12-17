@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>行排序去重工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">文本处理</li>
+                <li class="breadcrumb-item active" aria-current="page">行排序去重</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">行排序去重工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">输入文本</label>
+                    <textarea class="form-control" id="inputText" rows="6" placeholder="请输入要处理的文本，每行一条数据"></textarea>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="sortOrder" class="form-label">排序方式</label>
+                        <select class="form-select" id="sortOrder">
+                            <option value="asc">升序排列</option>
+                            <option value="desc">降序排列</option>
+                            <option value="none">不排序</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="sortType" class="form-label">排序类型</label>
+                        <select class="form-select" id="sortType">
+                            <option value="alphabetical">字母排序</option>
+                            <option value="numerical">数值排序</option>
+                            <option value="length">长度排序</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="removeDuplicates" checked>
+                        <label class="form-check-label" for="removeDuplicates">
+                            去除重复行
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ignoreCase">
+                        <label class="form-check-label" for="ignoreCase">
+                            忽略大小写（去重时）
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="trimLines">
+                        <label class="form-check-label" for="trimLines">
+                            移除行首行尾空白字符
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="processBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-sort-down me-1"></i>
+                            执行处理
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="outputText" class="form-label">输出结果</label>
+                    <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <strong>行数统计:</strong> 
+                            <span id="inputLineCount">0</span> → <span id="outputLineCount">0</span> 行
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于行排序去重</h5>
+            </div>
+            <div class="card-body">
+                <h6>功能说明</h6>
+                <p>
+                    行排序去重工具可以帮助用户对文本按行进行排序和去重处理，常用于数据清洗、日志分析等场景。
+                </p>
+                
+                <h6>排序方式</h6>
+                <ul>
+                    <li><strong>升序排列：</strong>按从小到大顺序排列</li>
+                    <li><strong>降序排列：</strong>按从大到小顺序排列</li>
+                    <li><strong>不排序：</strong>仅执行去重操作</li>
+                </ul>
+                
+                <h6>排序类型</h6>
+                <ul>
+                    <li><strong>字母排序：</strong>按字母顺序排序（默认）</li>
+                    <li><strong>数值排序：</strong>按数值大小排序</li>
+                    <li><strong>长度排序：</strong>按字符串长度排序</li>
+                </ul>
+                
+                <h6>处理选项</h6>
+                <ul>
+                    <li><strong>去除重复行：</strong>移除内容完全相同的行</li>
+                    <li><strong>忽略大小写：</strong>去重时忽略字母大小写差异</li>
+                    <li><strong>移除行首行尾空白：</strong>清理每行前后的空格、制表符等空白字符</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>数据清洗和标准化</li>
+                    <li>日志文件分析</li>
+                    <li>词汇表整理</li>
+                    <li>名单去重和排序</li>
+                    <li>代码重构时清理重复导入</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>在输入框中输入需要处理的文本（每行一条数据）</li>
+                    <li>选择排序方式和排序类型</li>
+                    <li>根据需要勾选处理选项</li>
+                    <li>点击"执行处理"按钮</li>
+                    <li>在输出框中查看处理结果</li>
+                    <li>使用"复制结果"按钮将结果复制到剪贴板</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>数值排序时，非数值行可能会导致意外结果</li>
+                    <li>忽略大小写仅影响去重，不影响排序</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const sortOrder = document.getElementById('sortOrder');
+            const sortType = document.getElementById('sortType');
+            const removeDuplicates = document.getElementById('removeDuplicates');
+            const ignoreCase = document.getElementById('ignoreCase');
+            const trimLines = document.getElementById('trimLines');
+            const inputLineCount = document.getElementById('inputLineCount');
+            const outputLineCount = document.getElementById('outputLineCount');
+            
+            // 更新行数统计
+            function updateLineCount() {
+                const inputLines = inputText.value.split('\n').filter(line => line.trim() !== '');
+                inputLineCount.textContent = inputLines.length;
+                
+                const outputLines = outputText.value.split('\n').filter(line => line.trim() !== '');
+                outputLineCount.textContent = outputLines.length;
+            }
+            
+            // 监听输入框变化
+            inputText.addEventListener('input', updateLineCount);
+            outputText.addEventListener('input', updateLineCount);
+            
+            // 执行处理
+            document.getElementById('processBtn').addEventListener('click', function() {
+                try {
+                    const text = inputText.value;
+                    const order = sortOrder.value;
+                    const type = sortType.value;
+                    const dedupe = removeDuplicates.checked;
+                    const ignore = ignoreCase.checked;
+                    const trim = trimLines.checked;
+                    
+                    if (!text) {
+                        showToast('请输入要处理的文本', 'error');
+                        return;
+                    }
+                    
+                    // 按行分割文本
+                    let lines = text.split('\n');
+                    
+                    // 移除行首行尾空白字符
+                    if (trim) {
+                        lines = lines.map(line => line.trim());
+                    }
+                    
+                    // 移除空行
+                    lines = lines.filter(line => line !== '');
+                    
+                    // 去除重复行
+                    if (dedupe) {
+                        const seen = new Set();
+                        lines = lines.filter(line => {
+                            const comparable = ignore ? line.toLowerCase() : line;
+                            if (seen.has(comparable)) {
+                                return false;
+                            }
+                            seen.add(comparable);
+                            return true;
+                        });
+                    }
+                    
+                    // 排序
+                    if (order !== 'none') {
+                        lines.sort((a, b) => {
+                            let valA = a;
+                            let valB = b;
+                            
+                            // 根据排序类型处理
+                            switch(type) {
+                                case 'numerical':
+                                    valA = parseFloat(a) || 0;
+                                    valB = parseFloat(b) || 0;
+                                    return order === 'asc' ? valA - valB : valB - valA;
+                                    
+                                case 'length':
+                                    valA = a.length;
+                                    valB = b.length;
+                                    return order === 'asc' ? valA - valB : valB - valA;
+                                    
+                                case 'alphabetical':
+                                default:
+                                    if (order === 'desc') {
+                                        [valA, valB] = [valB, valA];
+                                    }
+                                    return valA.localeCompare(valB);
+                            }
+                        });
+                    }
+                    
+                    // 生成结果
+                    const result = lines.join('\n');
+                    outputText.value = result;
+                    updateLineCount();
+                } catch (e) {
+                    showToast('处理出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+                updateLineCount();
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+                updateLineCount();
+            });
+            
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

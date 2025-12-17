@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片压缩 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <style>
+        .preview-container {
+            max-width: 100%;
+            overflow: auto;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            margin: 0 auto;
+        }
+        .preview-placeholder {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 4px;
+            color: #6c757d;
+        }
+        .compression-settings {
+            display: none;
+        }
+        #qualityCompressionSettings {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">图片处理</li>
+                <li class="breadcrumb-item">图片压缩</li>
+                <li class="breadcrumb-item active" aria-current="page">压缩</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">图片上传与压缩设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="imageUpload" class="form-label">选择图片</label>
+                            <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                        </div>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill"></i> 支持 JPG、PNG、WebP 等常见图片格式
+                        </div>
+                        
+                        <!-- 使用分割线将上传和设置分开 -->
+                        <div class="d-flex align-items-center my-4">
+                          <div class="flex-grow-1 border-top"></div>
+                          <span class="mx-3 text-muted">
+                            <i class="bi bi-gear-fill me-1"></i>
+                            压缩设置
+                          </span>
+                          <div class="flex-grow-1 border-top"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="mb-3">
+                                <label for="compressionType" class="form-label">压缩类型</label>
+                                <select class="form-select" id="compressionType">
+                                    <option value="quality" selected>按质量压缩</option>
+                                    <option value="size">按尺寸压缩</option>
+                                </select>
+                            </div>
+                            
+                            <div class="compression-settings" id="qualityCompressionSettings">
+                                <div class="mb-3">
+                                    <label for="qualityLevel" class="form-label">质量级别: <span id="qualityValue">80</span>%</label>
+                                    <input type="range" class="form-range" id="qualityLevel" min="1" max="100" value="80">
+                                </div>
+                            </div>
+                            
+                            <div class="compression-settings" id="sizeCompressionSettings">
+                                <div class="mb-3">
+                                    <label for="sizePercentage" class="form-label">尺寸比例: <span id="sizeValue">80</span>%</label>
+                                    <input type="range" class="form-range" id="sizePercentage" min="1" max="100" value="80">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="compressBtn" disabled>
+                            <i class="bi bi-file-zip me-1"></i>
+                            压缩图片
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">预览</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-container">
+                            <div id="imagePreviewPlaceholder" class="preview-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                            <img id="imagePreview" class="image-preview d-none" alt="图片预览">
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="downloadBtn" disabled>
+                                    <i class="bi bi-download me-1"></i>
+                                    下载压缩后的图片
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3" id="compressionInfo" style="display: none;">
+                            <div class="alert alert-info">
+                                <strong>压缩信息:</strong><br>
+                                原始大小: <span id="originalSize"></span><br>
+                                压缩后大小: <span id="compressedSize"></span><br>
+                                节省空间: <span id="spaceSaved"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 全局变量
+        let originalImage = null;
+        let compressedImageBlob = null;
+        let originalFileSize = 0;
+        let originalFileName = '';
+        let isProcessing = false; // 防止频繁触发处理
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            // 文件上传事件
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // 压缩按钮事件
+            document.getElementById('compressBtn').addEventListener('click', function() {
+                compressImage(true); // 手动点击按钮时强制更新
+            });
+            
+            // 下载按钮事件
+            document.getElementById('downloadBtn').addEventListener('click', downloadCompressedImage);
+            
+            // 压缩类型选择事件
+            document.getElementById('compressionType').addEventListener('change', function() {
+                const qualitySettings = document.getElementById('qualityCompressionSettings');
+                const sizeSettings = document.getElementById('sizeCompressionSettings');
+                
+                if (this.value === 'quality') {
+                    qualitySettings.style.display = 'block';
+                    sizeSettings.style.display = 'none';
+                } else {
+                    qualitySettings.style.display = 'none';
+                    sizeSettings.style.display = 'block';
+                }
+                // 实时压缩
+                compressImage(false);
+            });
+            
+            // 质量滑块事件
+            document.getElementById('qualityLevel').addEventListener('input', function() {
+                document.getElementById('qualityValue').textContent = this.value;
+                // 实时压缩
+                compressImage(false);
+            });
+            
+            // 尺寸滑块事件
+            document.getElementById('sizePercentage').addEventListener('input', function() {
+                document.getElementById('sizeValue').textContent = this.value;
+                // 实时压缩
+                compressImage(false);
+            });
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 保存原始文件大小
+            originalFileSize = file.size;
+            document.getElementById('originalSize').textContent = formatFileSize(originalFileSize);
+
+            // 获取原始文件名（不含扩展名）
+            const fileName = file.name;
+            const lastDotIndex = fileName.lastIndexOf('.');
+            originalFileName = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showToast('请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    // 显示原始图片
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 启用压缩按钮
+                    document.getElementById('compressBtn').disabled = false;
+                    
+                    // 实时压缩
+                    compressImage(false);
+                    
+                    showToast('图片上传成功', 'success');
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 压缩图片
+        function compressImage(forceUpdate = false) {
+            // 防止频繁触发处理
+            if (isProcessing && !forceUpdate) return;
+            
+            if (!originalImage) {
+                return;
+            }
+
+            const compressionType = document.getElementById('compressionType').value;
+            
+            isProcessing = true;
+            
+            try {
+                let width, height;
+                
+                if (compressionType === 'quality') {
+                    // 按质量压缩，保持原始尺寸
+                    width = originalImage.width;
+                    height = originalImage.height;
+                } else {
+                    // 按尺寸压缩
+                    const sizePercentage = parseInt(document.getElementById('sizePercentage').value) / 100;
+                    width = Math.round(originalImage.width * sizePercentage);
+                    height = Math.round(originalImage.height * sizePercentage);
+                }
+
+                // 创建canvas进行图片压缩
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = width;
+                canvas.height = height;
+
+                // 绘制图片
+                ctx.fillStyle = '#FFFFFF'; // 设置白色背景
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(originalImage, 0, 0, width, height);
+
+                // 获取压缩参数
+                let mimeType = 'image/jpeg';
+                let quality = 0.8;
+                
+                if (compressionType === 'quality') {
+                    quality = parseInt(document.getElementById('qualityLevel').value) / 100;
+                }
+
+                // 转换为blob并保存
+                canvas.toBlob(function(blob) {
+                    compressedImageBlob = blob;
+                    
+                    // 显示压缩后的图片
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    const url = URL.createObjectURL(blob);
+                    previewImg.src = url;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 显示压缩信息
+                    const compressedSize = blob.size;
+                    const spaceSaved = originalFileSize - compressedSize;
+                    const spaceSavedPercent = ((spaceSaved / originalFileSize) * 100).toFixed(1);
+                    
+                    document.getElementById('compressedSize').textContent = formatFileSize(compressedSize);
+                    document.getElementById('spaceSaved').textContent = formatFileSize(spaceSaved) + ' (' + spaceSavedPercent + '%)';
+                    document.getElementById('compressionInfo').style.display = 'block';
+                    
+                    // 启用下载按钮
+                    document.getElementById('downloadBtn').disabled = false;
+                    
+                    isProcessing = false;
+                    
+                    if (forceUpdate) {
+                        showToast('图片压缩完成', 'success');
+                    }
+                }, mimeType, quality);
+            } catch (error) {
+                isProcessing = false;
+                if (forceUpdate) {
+                    showToast('图片压缩失败: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // 下载压缩后的图片
+        function downloadCompressedImage() {
+            if (!compressedImageBlob) {
+                showToast('没有可下载的图片', 'error');
+                return;
+            }
+
+            const fileName = originalFileName + '-compressed.jpg';
+            const url = URL.createObjectURL(compressedImageBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            showToast('图片下载完成', 'success');
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>

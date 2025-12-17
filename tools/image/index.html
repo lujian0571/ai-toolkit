@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片处理工具 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../asset/common.css">
+    <style>
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .tool-card {
+            transition: transform 0.2s;
+            height: 100%;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+        }
+        .preview-container {
+            max-width: 100%;
+            overflow: auto;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">图片处理</li>
+                <li class="breadcrumb-item active" aria-current="page">工具集</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">图片处理工具集</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>提供全面的在线图片处理功能，所有操作均在浏览器端完成，保证您的隐私安全。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col">
+                <div class="card tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon text-primary">
+                            <i class="bi bi-arrows-angle-expand"></i>
+                        </div>
+                        <h5 class="card-title">图片尺寸调整</h5>
+                        <p class="card-text">调整图片的宽度和高度，支持多种缩放算法</p>
+                        <a href="resizer/" class="btn btn-primary">立即使用</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="card tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon text-success">
+                            <i class="bi bi-file-earmark-image"></i>
+                        </div>
+                        <h5 class="card-title">图片格式转换</h5>
+                        <p class="card-text">JPG/PNG/WebP 等格式互相转换</p>
+                        <a href="converter/" class="btn btn-success">立即使用</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="card tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon text-info">
+                            <i class="bi bi-file-zip"></i>
+                        </div>
+                        <h5 class="card-title">图片压缩</h5>
+                        <p class="card-text">按质量或尺寸压缩图片，减小文件大小</p>
+                        <a href="compressor/" class="btn btn-info">立即使用</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="card tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon text-warning">
+                            <i class="bi bi-water"></i>
+                        </div>
+                        <h5 class="card-title">添加水印</h5>
+                        <p class="card-text">为图片添加文字或图片水印</p>
+                        <a href="watermark/" class="btn btn-warning">立即使用</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col">
+                <div class="card tool-card">
+                    <div class="card-body text-center">
+                        <div class="tool-icon text-danger">
+                            <i class="bi bi-app-indicator"></i>
+                        </div>
+                        <h5 class="card-title">ICO 图标生成</h5>
+                        <p class="card-text">将图片转换为 ICO 格式图标</p>
+                        <a href="ico/" class="btn btn-danger">立即使用</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../asset/navbar.js"></script>
+    <script src="../asset/footer.js"></script>
+    <script src="../asset/common.js"></script>
+</body>
+</html>

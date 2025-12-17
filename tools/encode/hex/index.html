@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hex 编码/解码工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">编码解码</li>
+                <li class="breadcrumb-item active" aria-current="page">Hex 编码/解码</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Hex 编码/解码工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">输入文本</label>
+                    <textarea class="form-control" id="inputText" rows="4" placeholder="请输入要处理的文本"></textarea>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="encodeBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-arrow-right me-1"></i>
+                            Hex 编码
+                        </button>
+                        <button id="decodeBtn" class="btn btn-success me-2">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Hex 解码
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="outputText" class="form-label">输出结果</label>
+                    <textarea class="form-control" id="outputText" rows="4" readonly></textarea>
+                </div>
+                
+                <button id="copyBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-clipboard me-1"></i>
+                    复制结果
+                </button>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于 Hex 编码</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是 Hex 编码</h6>
+                <p>
+                    Hex（十六进制）编码是一种将二进制数据表示为十六进制数字的编码方式。
+                    每个十六进制数字代表4位二进制数据，两个十六进制数字组成一个字节（8位）。
+                </p>
+                
+                <h6>Hex 编码原理</h6>
+                <ul>
+                    <li>使用 0-9 和 A-F（或 a-f）这 16 个字符表示数据</li>
+                    <li>每个字符代表 4 位二进制数（半字节）</li>
+                    <li>每两个字符表示一个完整的字节（8位）</li>
+                    <li>例如：字母 'A' 的 ASCII 码是 65，十六进制表示为 41</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>在编程中表示二进制数据</li>
+                    <li>在网络安全中表示密文或哈希值</li>
+                    <li>在调试中查看内存数据</li>
+                    <li>在网页开发中表示颜色值（如 #FF0000 表示红色）</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li><strong>编码：</strong>在输入框中输入原文，点击"Hex 编码"按钮</li>
+                    <li><strong>解码：</strong>在输入框中输入十六进制字符串，点击"Hex 解码"按钮</li>
+                    <li><strong>交换内容：</strong>点击"交换内容"按钮可以将输入框和输出框的内容互换，方便连续操作</li>
+                    <li><strong>清空：</strong>点击"清空"按钮可以同时清空所有输入框和输出框的内容</li>
+                    <li><strong>复制结果：</strong>点击"复制结果"按钮可以将输出框中的内容复制到剪贴板</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>解码时输入的必须是有效的十六进制字符串（0-9, A-F, a-f）</li>
+                    <li>解码时字符串长度必须为偶数（每两个字符表示一个字节）</li>
+                    <li>无效的十六进制字符会导致解码失败</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            
+            // Hex 编码
+            document.getElementById('encodeBtn').addEventListener('click', function() {
+                try {
+                    const text = inputText.value;
+                    if (!text) {
+                        showToast('请输入要编码的文本', 'error');
+                        return;
+                    }
+                    
+                    // 将字符串转换为十六进制
+                    let hex = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const hexChar = text.charCodeAt(i).toString(16).padStart(2, '0');
+                        hex += hexChar;
+                    }
+                    
+                    outputText.value = hex.toUpperCase();
+                } catch (e) {
+                    showToast('编码出错: ' + e.message, 'error');
+                }
+            });
+            
+            // Hex 解码
+            document.getElementById('decodeBtn').addEventListener('click', function() {
+                try {
+                    const hex = inputText.value.trim();
+                    if (!hex) {
+                        showToast('请输入要解码的十六进制字符串', 'error');
+                        return;
+                    }
+                    
+                    // 验证输入是否为有效的十六进制字符串
+                    if (!/^[0-9A-Fa-f]+$/.test(hex)) {
+                        showToast('输入的不是有效的十六进制字符串', 'error');
+                        return;
+                    }
+                    
+                    // 验证长度是否为偶数
+                    if (hex.length % 2 !== 0) {
+                        showToast('十六进制字符串长度必须为偶数', 'error');
+                        return;
+                    }
+                    
+                    // 将十六进制转换为字符串
+                    let str = '';
+                    for (let i = 0; i < hex.length; i += 2) {
+                        const charCode = parseInt(hex.substr(i, 2), 16);
+                        str += String.fromCharCode(charCode);
+                    }
+                    
+                    outputText.value = str;
+                } catch (e) {
+                    showToast('解码出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+            
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

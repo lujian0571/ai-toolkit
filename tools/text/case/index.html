@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大小写转换工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">文本处理</li>
+                <li class="breadcrumb-item active" aria-current="page">大小写转换</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">大小写转换工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">输入文本</label>
+                    <textarea class="form-control" id="inputText" rows="6" placeholder="请输入要处理的文本"></textarea>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="conversionType" class="form-label">转换类型</label>
+                        <select class="form-select" id="conversionType">
+                            <option value="uppercase">转换为大写</option>
+                            <option value="lowercase">转换为小写</option>
+                            <option value="capitalize">首字母大写</option>
+                            <option value="titleCase">标题大小写</option>
+                            <option value="sentenceCase">句首字母大写</option>
+                            <option value="toggleCase">大小写互换</option>
+                            <option value="camelCase">驼峰命名法</option>
+                            <option value="pascalCase">帕斯卡命名法</option>
+                            <option value="snakeCase">蛇形命名法</option>
+                            <option value="kebabCase">烤串命名法</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="convertBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            执行转换
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="outputText" class="form-label">输出结果</label>
+                    <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                </div>
+                
+                <button id="copyBtn" class="btn btn-outline-secondary">
+                    <i class="bi bi-clipboard me-1"></i>
+                    复制结果
+                </button>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于大小写转换</h5>
+            </div>
+            <div class="card-body">
+                <h6>大小写转换类型说明</h6>
+                <ul>
+                    <li><strong>转换为大写：</strong>将所有字母转换为大写形式</li>
+                    <li><strong>转换为小写：</strong>将所有字母转换为小写形式</li>
+                    <li><strong>首字母大写：</strong>将第一个字母转换为大写，其余保持不变</li>
+                    <li><strong>标题大小写：</strong>将每个单词的首字母转换为大写</li>
+                    <li><strong>句首字母大写：</strong>将每个句子的第一个字母转换为大写</li>
+                    <li><strong>大小写互换：</strong>将大写字母转换为小写，小写字母转换为大写</li>
+                    <li><strong>驼峰命名法：</strong>第一个单词小写，后续单词首字母大写并连接</li>
+                    <li><strong>帕斯卡命名法：</strong>每个单词首字母都大写并连接</li>
+                    <li><strong>蛇形命名法：</strong>所有字母小写，单词间用下划线连接</li>
+                    <li><strong>烤串命名法：</strong>所有字母小写，单词间用连字符连接</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>格式化文本以满足特定要求</li>
+                    <li>编程中的变量命名规范</li>
+                    <li>文档标题格式化</li>
+                    <li>数据清洗和标准化</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>在输入框中输入需要转换的文本</li>
+                    <li>选择合适的转换类型</li>
+                    <li>点击"执行转换"按钮</li>
+                    <li>在输出框中查看转换结果</li>
+                    <li>可使用"交换内容"按钮将输入输出内容互换进行连续操作</li>
+                    <li>使用"复制结果"按钮将结果复制到剪贴板</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>不同转换类型适用于不同场景，请根据需要选择</li>
+                    <li>命名法转换会移除特殊字符，仅保留字母和数字</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const conversionType = document.getElementById('conversionType');
+            
+            // 执行转换
+            document.getElementById('convertBtn').addEventListener('click', function() {
+                try {
+                    const text = inputText.value;
+                    const type = conversionType.value;
+                    
+                    if (!text) {
+                        showToast('请输入要转换的文本', 'error');
+                        return;
+                    }
+                    
+                    let result = '';
+                    
+                    switch(type) {
+                        case 'uppercase':
+                            result = text.toUpperCase();
+                            break;
+                        case 'lowercase':
+                            result = text.toLowerCase();
+                            break;
+                        case 'capitalize':
+                            result = text.charAt(0).toUpperCase() + text.slice(1);
+                            break;
+                        case 'titleCase':
+                            result = text.toLowerCase().split(' ').map(word => {
+                                return word.charAt(0).toUpperCase() + word.slice(1);
+                            }).join(' ');
+                            break;
+                        case 'sentenceCase':
+                            result = text.toLowerCase().replace(/(^\s*\w|[\.\!\?]\s+\w)/g, function(c) {
+                                return c.toUpperCase();
+                            });
+                            break;
+                        case 'toggleCase':
+                            result = text.split('').map(char => {
+                                return char === char.toUpperCase() ? char.toLowerCase() : char.toUpperCase();
+                            }).join('');
+                            break;
+                        case 'camelCase':
+                            result = toCamelCase(text);
+                            break;
+                        case 'pascalCase':
+                            result = toPascalCase(text);
+                            break;
+                        case 'snakeCase':
+                            result = toSnakeCase(text);
+                            break;
+                        case 'kebabCase':
+                            result = toKebabCase(text);
+                            break;
+                        default:
+                            result = text;
+                    }
+                    
+                    outputText.value = result;
+                } catch (e) {
+                    showToast('转换出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 转换为驼峰命名法
+            function toCamelCase(str) {
+                return str.replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase());
+            }
+            
+            // 转换为帕斯卡命名法
+            function toPascalCase(str) {
+                return str.replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase())
+                         .replace(/^./, str.charAt(0).toUpperCase());
+            }
+            
+            // 转换为蛇形命名法
+            function toSnakeCase(str) {
+                return str.replace(/[^a-zA-Z0-9]/g, ' ')
+                         .trim()
+                         .replace(/\s+/g, '_')
+                         .toLowerCase();
+            }
+            
+            // 转换为烤串命名法
+            function toKebabCase(str) {
+                return str.replace(/[^a-zA-Z0-9]/g, ' ')
+                         .trim()
+                         .replace(/\s+/g, '-')
+                         .toLowerCase();
+            }
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+            
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

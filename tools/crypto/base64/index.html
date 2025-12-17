@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 加解密工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">Base64 加解密工具</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Base64 编码/解码工具</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">输入文本</label>
+                            <textarea class="form-control" id="inputText" rows="6" placeholder="请输入要处理的文本"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <button id="encodeBtn" class="btn btn-primary me-2">
+                                    <i class="bi bi-lock me-1"></i>
+                                    Base64 编码
+                                </button>
+                                <button id="decodeBtn" class="btn btn-success me-2">
+                                    <i class="bi bi-unlock me-1"></i>
+                                    Base64 解码
+                                </button>
+                            </div>
+                            <div>
+                                <button id="swapBtn" class="btn btn-info me-2">
+                                    <i class="bi bi-arrow-left-right me-1"></i>
+                                    交换内容
+                                </button>
+                                <button id="clearBtn" class="btn btn-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="outputText" class="form-label">输出结果</label>
+                            <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                        </div>
+                        
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">关于 Base64</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5>什么是 Base64</h5>
+                        <p class="card-text">
+                            Base64 是一种基于 64 个可打印字符来表示二进制数据的编码方式。它通常用于在通常处理文本数据的场合传输二进制数据，保证数据在传输过程中不被修改或损坏。
+                        </p>
+                        
+                        <h5>Base64 的用途</h5>
+                        <ul>
+                            <li>在电子邮件系统中传输二进制附件</li>
+                            <li>在网页中嵌入图片或其他媒体文件</li>
+                            <li>在 JSON 或 XML 中安全地传输二进制数据</li>
+                            <li>在 URL 中传递特殊字符</li>
+                        </ul>
+                        
+                        <h5>如何使用本工具</h5>
+                        <ol>
+                            <li><strong>编码：</strong>在输入框中粘贴或输入需要编码的文本，点击"Base64 编码"按钮，即可在输出框中看到编码后的结果。</li>
+                            <li><strong>解码：</strong>在输入框中粘贴或输入需要解码的 Base64 字符串，点击"Base64 解码"按钮，即可在输出框中看到解码后的原文。</li>
+                            <li><strong>交换内容：</strong>点击"交换内容"按钮可以将输入框和输出框的内容互换，方便连续操作。</li>
+                            <li><strong>清空：</strong>点击"清空"按钮可以同时清空输入框和输出框的内容。</li>
+                            <li><strong>复制结果：</strong>点击"复制结果"按钮可以将输出框中的内容复制到剪贴板。</li>
+                        </ol>
+                        
+                        <h5>注意事项</h5>
+                        <ul>
+                            <li>Base64 编码会增加约 33% 的数据长度</li>
+                            <li>Base64 不是一种加密方法，只是一种编码方式</li>
+                            <li>解码时如果输入的不是有效的 Base64 字符串，可能会出现错误</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            
+            // 编码功能
+            document.getElementById('encodeBtn').addEventListener('click', function() {
+                try {
+                    const encoded = btoa(unescape(encodeURIComponent(inputText.value)));
+                    outputText.value = encoded;
+                } catch (e) {
+                    showToast('编码出错: ' + e.message, 'error');
+                }
+            });
+
+            // 解码功能
+            document.getElementById('decodeBtn').addEventListener('click', function() {
+                try {
+                    const decoded = decodeURIComponent(escape(atob(inputText.value)));
+                    outputText.value = decoded;
+                } catch (e) {
+                    showToast('解码出错: ' + e.message, 'error');
+                }
+            });
+
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

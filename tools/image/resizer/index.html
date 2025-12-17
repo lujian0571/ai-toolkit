@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片尺寸调整 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <style>
+        .preview-container {
+            max-width: 100%;
+            overflow: auto;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 400px;
+            display: block;
+            margin: 0 auto;
+        }
+        .preview-placeholder {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 4px;
+            color: #6c757d;
+        }
+        .dimension-input {
+            max-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">图片处理</li>
+                <li class="breadcrumb-item">图片尺寸调整</li>
+                <li class="breadcrumb-item active" aria-current="page">调整</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">图片上传与调整参数</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="imageUpload" class="form-label">选择图片</label>
+                            <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                        </div>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill"></i> 支持 JPG、PNG、WebP 等常见图片格式
+                        </div>
+                        
+                        <!-- 使用分割线将上传和设置分开 -->
+                        <div class="d-flex align-items-center my-4">
+                          <div class="flex-grow-1 border-top"></div>
+                          <span class="mx-3 text-muted">
+                            <i class="bi bi-gear-fill me-1"></i>
+                            调整参数
+                          </span>
+                          <div class="flex-grow-1 border-top"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="mb-3">
+                                <label for="resizeWidth" class="form-label">宽度 (像素)</label>
+                                <input type="number" class="form-control dimension-input" id="resizeWidth" min="1" value="800">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="resizeHeight" class="form-label">高度 (像素)</label>
+                                <input type="number" class="form-control dimension-input" id="resizeHeight" min="1" value="600">
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="maintainAspectRatio" checked>
+                                <label class="form-check-label" for="maintainAspectRatio">
+                                    保持宽高比
+                                </label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="resizeMethod" class="form-label">缩放算法</label>
+                                <select class="form-select" id="resizeMethod">
+                                    <option value="nearest" selected>最近邻插值</option>
+                                    <option value="bilinear">双线性插值</option>
+                                    <option value="bicubic">双三次插值</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="resizeBtn" disabled>
+                            <i class="bi bi-arrows-angle-expand me-1"></i>
+                            调整尺寸
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">预览</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-container">
+                            <div id="imagePreviewPlaceholder" class="preview-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                            <img id="imagePreview" class="image-preview d-none" alt="图片预览">
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="downloadBtn" disabled>
+                                    <i class="bi bi-download me-1"></i>
+                                    下载调整后的图片
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 全局变量
+        let originalImage = null;
+        let resizedImageBlob = null;
+        let isProcessing = false; // 防止频繁触发处理
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            // 文件上传事件
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // 调整尺寸按钮事件
+            document.getElementById('resizeBtn').addEventListener('click', function() {
+                resizeImage(true); // 手动点击按钮时强制更新
+            });
+            
+            // 下载按钮事件
+            document.getElementById('downloadBtn').addEventListener('click', downloadResizedImage);
+            
+            // 宽度输入框事件
+            document.getElementById('resizeWidth').addEventListener('input', function() {
+                if (document.getElementById('maintainAspectRatio').checked && originalImage) {
+                    const aspectRatio = originalImage.width / originalImage.height;
+                    const newHeight = Math.round(this.value / aspectRatio);
+                    document.getElementById('resizeHeight').value = newHeight;
+                }
+                // 实时调整尺寸
+                resizeImage(false);
+            });
+            
+            // 高度输入框事件
+            document.getElementById('resizeHeight').addEventListener('input', function() {
+                if (document.getElementById('maintainAspectRatio').checked && originalImage) {
+                    const aspectRatio = originalImage.width / originalImage.height;
+                    const newWidth = Math.round(this.value * aspectRatio);
+                    document.getElementById('resizeWidth').value = newWidth;
+                }
+                // 实时调整尺寸
+                resizeImage(false);
+            });
+            
+            // 保持宽高比复选框事件
+            document.getElementById('maintainAspectRatio').addEventListener('change', function() {
+                if (this.checked && originalImage) {
+                    const aspectRatio = originalImage.width / originalImage.height;
+                    const newWidth = document.getElementById('resizeWidth').value;
+                    const newHeight = Math.round(newWidth / aspectRatio);
+                    document.getElementById('resizeHeight').value = newHeight;
+                }
+            });
+            
+            // 缩放算法选择事件
+            document.getElementById('resizeMethod').addEventListener('change', function() {
+                // 实时调整尺寸
+                resizeImage(false);
+            });
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showToast('请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    // 显示原始图片
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 启用调整按钮
+                    document.getElementById('resizeBtn').disabled = false;
+                    
+                    // 设置默认尺寸为原始尺寸
+                    document.getElementById('resizeWidth').value = originalImage.width;
+                    document.getElementById('resizeHeight').value = originalImage.height;
+                    
+                    // 实时调整尺寸
+                    resizeImage(false);
+                    
+                    showToast('图片上传成功', 'success');
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 调整图片尺寸
+        function resizeImage(forceUpdate = false) {
+            // 防止频繁触发处理
+            if (isProcessing && !forceUpdate) return;
+            
+            if (!originalImage) {
+                return;
+            }
+
+            const width = parseInt(document.getElementById('resizeWidth').value);
+            const height = parseInt(document.getElementById('resizeHeight').value);
+            const method = document.getElementById('resizeMethod').value;
+
+            if (isNaN(width) || isNaN(height) || width <= 0 || height <= 0) {
+                return;
+            }
+
+            isProcessing = true;
+            
+            try {
+                // 创建canvas进行图片调整
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = width;
+                canvas.height = height;
+
+                // 根据选择的算法进行绘制
+                switch (method) {
+                    case 'nearest':
+                        ctx.imageSmoothingEnabled = false;
+                        break;
+                    case 'bilinear':
+                    case 'bicubic':
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        break;
+                }
+
+                // 绘制调整后的图片
+                ctx.drawImage(originalImage, 0, 0, width, height);
+
+                // 转换为blob并保存
+                canvas.toBlob(function(blob) {
+                    resizedImageBlob = blob;
+                    // 显示调整后的图片
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    const url = URL.createObjectURL(blob);
+                    previewImg.src = url;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 启用下载按钮
+                    document.getElementById('downloadBtn').disabled = false;
+                    
+                    isProcessing = false;
+                }, 'image/png');
+            } catch (error) {
+                isProcessing = false;
+                console.error('图片调整失败:', error);
+            }
+        }
+
+        // 下载调整后的图片
+        function downloadResizedImage() {
+            if (!resizedImageBlob) {
+                showToast('没有可下载的图片', 'error');
+                return;
+            }
+
+            const fileName = 'resized-image.png';
+            const url = URL.createObjectURL(resizedImageBlob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            showToast('图片下载完成', 'success');
+        }
+    </script>
+</body>
+</html>

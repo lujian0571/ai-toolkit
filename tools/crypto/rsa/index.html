@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA 加解密工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">RSA 加解密工具</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">RSA 加密/解密工具</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">输入文本</label>
+                            <textarea class="form-control" id="inputText" rows="4" placeholder="请输入要处理的文本"></textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="publicKey" class="form-label">公钥 (Public Key)</label>
+                                <textarea class="form-control" id="publicKey" rows="5" placeholder="请输入公钥"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="privateKey" class="form-label">私钥 (Private Key)</label>
+                                <textarea class="form-control" id="privateKey" rows="5" placeholder="请输入私钥"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <button id="encryptBtn" class="btn btn-primary me-2">
+                                    <i class="bi bi-lock me-1"></i>
+                                    RSA 公钥加密
+                                </button>
+                                <button id="decryptBtn" class="btn btn-success me-2">
+                                    <i class="bi bi-unlock me-1"></i>
+                                    RSA 私钥解密
+                                </button>
+                            </div>
+                            <div>
+                                <button id="swapBtn" class="btn btn-info me-2">
+                                    <i class="bi bi-arrow-left-right me-1"></i>
+                                    交换内容
+                                </button>
+                                <button id="clearBtn" class="btn btn-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="outputText" class="form-label">输出结果</label>
+                            <textarea class="form-control" id="outputText" rows="4" readonly></textarea>
+                        </div>
+                        
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">关于 RSA</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5>什么是 RSA</h5>
+                        <p class="card-text">
+                            RSA 是一种非对称加密算法，由 Ron Rivest、Adi Shamir 和 Leonard Adleman 在 1977 年共同提出。
+                            RSA 算法基于大数分解的数学难题，是目前应用最广泛的公钥加密算法之一。
+                        </p>
+                        
+                        <h5>RSA 工作原理</h5>
+                        <ul>
+                            <li><strong>密钥生成：</strong>选择两个大素数 p 和 q，计算 n=p*q，根据欧拉函数计算 φ(n)，选择公钥指数 e，计算私钥指数 d</li>
+                            <li><strong>公钥加密：</strong>使用接收方的公钥对明文进行加密，只有持有对应私钥的人才能解密</li>
+                            <li><strong>私钥解密：</strong>使用自己的私钥对密文进行解密，恢复原始明文</li>
+                        </ul>
+                        
+                        <h5>如何使用本工具</h5>
+                        <ol>
+                            <li><strong>加密：</strong>在输入框中输入明文，在公钥框中输入公钥，点击"RSA 公钥加密"按钮</li>
+                            <li><strong>解密：</strong>在输入框中输入密文，在私钥框中输入私钥，点击"RSA 私钥解密"按钮</li>
+                            <li><strong>密钥格式：</strong>支持 PEM 格式的公钥和私钥</li>
+                            <li><strong>交换内容：</strong>点击"交换内容"按钮可以将输入框和输出框的内容互换，方便连续操作</li>
+                            <li><strong>清空：</strong>点击"清空"按钮可以同时清空所有输入框和输出框的内容</li>
+                            <li><strong>复制结果：</strong>点击"复制结果"按钮可以将输出框中的内容复制到剪贴板</li>
+                        </ol>
+                        
+                        <h5>注意事项</h5>
+                        <ul>
+                            <li>RSA 加密的数据长度有限制，一般不超过密钥长度减去11字节</li>
+                            <li>对于长数据加密，通常采用对称加密+RSA混合加密方案</li>
+                            <li>公钥用于加密，私钥用于解密，两者不能混用</li>
+                            <li>私钥必须严格保密，一旦泄露将导致通信安全风险</li>
+                            <li>本工具使用 PKCS#1 v1.5 填充方式进行加密</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/jsencrypt@3.3.2/bin/jsencrypt.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const publicKey = document.getElementById('publicKey');
+            const privateKey = document.getElementById('privateKey');
+            
+            // 加密功能
+            document.getElementById('encryptBtn').addEventListener('click', function() {
+                try {
+                    const plaintext = inputText.value;
+                    const pubKey = publicKey.value;
+                    
+                    if (!plaintext) {
+                        showToast('请输入要加密的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!pubKey) {
+                        showToast('请输入公钥', 'error');
+                        return;
+                    }
+                    
+                    const encrypt = new JSEncrypt();
+                    encrypt.setPublicKey(pubKey);
+                    const encrypted = encrypt.encrypt(plaintext);
+                    
+                    if (encrypted) {
+                        outputText.value = encrypted;
+                    } else {
+                        showToast('加密失败，请检查公钥格式是否正确', 'error');
+                    }
+                } catch (e) {
+                    showToast('加密出错: ' + e.message, 'error');
+                }
+            });
+
+            // 解密功能
+            document.getElementById('decryptBtn').addEventListener('click', function() {
+                try {
+                    const ciphertext = inputText.value;
+                    const privKey = privateKey.value;
+                    
+                    if (!ciphertext) {
+                        showToast('请输入要解密的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!privKey) {
+                        showToast('请输入私钥', 'error');
+                        return;
+                    }
+                    
+                    const decrypt = new JSEncrypt();
+                    decrypt.setPrivateKey(privKey);
+                    const decrypted = decrypt.decrypt(ciphertext);
+                    
+                    if (decrypted !== false) {
+                        outputText.value = decrypted;
+                    } else {
+                        showToast('解密失败，请检查私钥格式是否正确', 'error');
+                    }
+                } catch (e) {
+                    showToast('解密出错: ' + e.message, 'error');
+                }
+            });
+
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+                publicKey.value = '';
+                privateKey.value = '';
+            });
+
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机数生成器</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">生成工具</li>
+                <li class="breadcrumb-item active" aria-current="page">随机数生成</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">随机数生成器</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="minValue" class="form-label">最小值</label>
+                        <input type="number" class="form-control" id="minValue" placeholder="请输入最小值" value="1">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="maxValue" class="form-label">最大值</label>
+                        <input type="number" class="form-control" id="maxValue" placeholder="请输入最大值" value="100">
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="count" class="form-label">生成数量</label>
+                        <input type="number" class="form-control" id="count" placeholder="请输入生成数量" value="1" min="1" max="1000">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="numberType" class="form-label">数字类型</label>
+                        <select class="form-select" id="numberType">
+                            <option value="integer" selected>整数</option>
+                            <option value="float">浮点数</option>
+                            <option value="unique">不重复整数</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3" id="decimalPlacesRow" style="display: none;">
+                    <div class="col-md-6">
+                        <label for="decimalPlaces" class="form-label">小数位数</label>
+                        <input type="number" class="form-control" id="decimalPlaces" placeholder="请输入小数位数" value="2" min="1" max="10">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="generateBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-shuffle me-1"></i>
+                            生成随机数
+                        </button>
+                    </div>
+                    <div>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空结果
+                        </button>
+                        <button id="copyBtn" class="btn btn-secondary ms-2" disabled>
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">生成结果</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="resultContainer" class="font-monospace">
+                                    <p class="text-muted">点击"生成随机数"按钮开始生成</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于随机数生成</h5>
+            </div>
+            <div class="card-body">
+                <h6>随机数概念</h6>
+                <p>
+                    随机数是指在一定范围内没有任何规律、不可预测的数。在计算机中，我们通常使用算法生成伪随机数，
+                    这些数字看起来是随机的，但实际上是由确定的算法产生的。
+                </p>
+                
+                <h6>随机数类型</h6>
+                <ul>
+                    <li><strong>整数：</strong>在指定范围内的整数值，如 1, 5, 100 等</li>
+                    <li><strong>浮点数：</strong>在指定范围内的带有小数部分的数值，如 1.25, 3.14159 等</li>
+                    <li><strong>不重复整数：</strong>在指定范围内生成的不重复的整数序列</li>
+                </ul>
+                
+                <h6>应用场景</h6>
+                <ul>
+                    <li><strong>游戏开发：</strong>生成随机事件、掉落物品、敌人行为等</li>
+                    <li><strong>统计抽样：</strong>从大数据集中随机选取样本</li>
+                    <li><strong>密码学：</strong>生成密钥、盐值等安全参数</li>
+                    <li><strong>模拟仿真：</strong>蒙特卡洛模拟等科学计算</li>
+                    <li><strong>抽奖活动：</strong>从参与者中随机选择获奖者</li>
+                </ul>
+                
+                <h6>生成原理</h6>
+                <p>
+                    现代计算机使用伪随机数生成器(PRG)来产生随机数序列。这些算法从一个种子值开始，
+                    通过数学公式生成看似随机的数字序列。JavaScript 的 Math.random() 函数就是一种常见的实现。
+                </p>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>设置随机数的最小值和最大值范围</li>
+                    <li>选择需要的数字类型（整数、浮点数或不重复整数）</li>
+                    <li>如果需要浮点数，可以设置小数位数</li>
+                    <li>设置要生成的随机数数量</li>
+                    <li>点击"生成随机数"按钮获取结果</li>
+                    <li>可以复制结果或将结果清空</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>本工具使用浏览器内置的随机数生成器，适用于一般用途</li>
+                    <li>对于高安全性要求的应用（如密码学），需要使用专门的加密安全随机数生成器</li>
+                    <li>生成大量不重复整数时，需确保范围足够大以避免性能问题</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const minValue = document.getElementById('minValue');
+            const maxValue = document.getElementById('maxValue');
+            const count = document.getElementById('count');
+            const numberType = document.getElementById('numberType');
+            const decimalPlaces = document.getElementById('decimalPlaces');
+            const decimalPlacesRow = document.getElementById('decimalPlacesRow');
+            const resultContainer = document.getElementById('resultContainer');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            // 数字类型改变事件
+            numberType.addEventListener('change', function() {
+                if (this.value === 'float') {
+                    decimalPlacesRow.style.display = 'block';
+                } else {
+                    decimalPlacesRow.style.display = 'none';
+                }
+            });
+            
+            // 生成随机数
+            document.getElementById('generateBtn').addEventListener('click', function() {
+                try {
+                    const min = parseFloat(minValue.value);
+                    const max = parseFloat(maxValue.value);
+                    const cnt = parseInt(count.value);
+                    const type = numberType.value;
+                    const decimals = parseInt(decimalPlaces.value);
+                    
+                    // 验证输入
+                    if (isNaN(min) || isNaN(max)) {
+                        showToast('请输入有效的最小值和最大值', 'error');
+                        return;
+                    }
+                    
+                    if (min >= max) {
+                        showToast('最小值必须小于最大值', 'error');
+                        return;
+                    }
+                    
+                    if (isNaN(cnt) || cnt <= 0 || cnt > 1000) {
+                        showToast('生成数量必须是1到1000之间的整数', 'error');
+                        return;
+                    }
+                    
+                    if (type === 'float' && (isNaN(decimals) || decimals <= 0 || decimals > 10)) {
+                        showToast('小数位数必须是1到10之间的整数', 'error');
+                        return;
+                    }
+                    
+                    let numbers;
+                    switch(type) {
+                        case 'integer':
+                            numbers = generateIntegers(min, max, cnt);
+                            break;
+                        case 'float':
+                            numbers = generateFloats(min, max, cnt, decimals);
+                            break;
+                        case 'unique':
+                            numbers = generateUniqueIntegers(min, max, cnt);
+                            break;
+                    }
+                    
+                    displayResults(numbers);
+                    copyBtn.disabled = false;
+                } catch (e) {
+                    showToast('生成随机数时出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 生成整数
+            function generateIntegers(min, max, count) {
+                const numbers = [];
+                for (let i = 0; i < count; i++) {
+                    const random = Math.floor(Math.random() * (max - min + 1)) + min;
+                    numbers.push(random);
+                }
+                return numbers;
+            }
+            
+            // 生成浮点数
+            function generateFloats(min, max, count, decimals) {
+                const numbers = [];
+                const multiplier = Math.pow(10, decimals);
+                for (let i = 0; i < count; i++) {
+                    const random = Math.random() * (max - min) + min;
+                    const rounded = Math.round(random * multiplier) / multiplier;
+                    numbers.push(rounded);
+                }
+                return numbers;
+            }
+            
+            // 生成不重复整数
+            function generateUniqueIntegers(min, max, count) {
+                // 检查范围是否足够
+                if (max - min + 1 < count) {
+                    throw new Error('范围内的整数数量不足以生成所需数量的不重复整数');
+                }
+                
+                const numbers = [];
+                const used = new Set();
+                
+                while (numbers.length < count) {
+                    const random = Math.floor(Math.random() * (max - min + 1)) + min;
+                    if (!used.has(random)) {
+                        used.add(random);
+                        numbers.push(random);
+                    }
+                }
+                
+                return numbers;
+            }
+            
+            // 显示结果
+            function displayResults(numbers) {
+                if (numbers.length === 0) {
+                    resultContainer.innerHTML = '<p class="text-muted">未生成任何随机数</p>';
+                    return;
+                }
+                
+                let html = '<div class="row g-2">';
+                numbers.forEach((num, index) => {
+                    html += `<div class="col-6 col-md-3 col-lg-2"><div class="border rounded p-2 text-center">${num}</div></div>`;
+                });
+                html += '</div>';
+                
+                resultContainer.innerHTML = html;
+            }
+            
+            // 清空结果
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                resultContainer.innerHTML = '<p class="text-muted">点击"生成随机数"按钮开始生成</p>';
+                copyBtn.disabled = true;
+            });
+            
+            // 复制结果
+            copyBtn.addEventListener('click', function() {
+                const text = resultContainer.innerText;
+                if (text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast('结果已复制到剪贴板', 'success');
+                    }).catch(() => {
+                        showToast('复制失败', 'error');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

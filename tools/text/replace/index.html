@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本替换工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">文本处理</li>
+                <li class="breadcrumb-item active" aria-current="page">文本替换</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">文本替换工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="inputText" class="form-label">输入文本</label>
+                    <textarea class="form-control" id="inputText" rows="6" placeholder="请输入要处理的文本"></textarea>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="searchText" class="form-label">查找文本</label>
+                        <input type="text" class="form-control" id="searchText" placeholder="请输入要查找的文本">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="replaceText" class="form-label">替换文本</label>
+                        <input type="text" class="form-control" id="replaceText" placeholder="请输入替换后的文本">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="mode" id="normalMode" value="normal" checked>
+                        <label class="form-check-label" for="normalMode">普通模式</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="mode" id="regexMode" value="regex">
+                        <label class="form-check-label" for="regexMode">正则表达式模式</label>
+                    </div>
+                </div>
+                
+                <div class="mb-3" id="regexOptions" style="display: none;">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="caseInsensitive">
+                        <label class="form-check-label" for="caseInsensitive">忽略大小写 (i)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="globalMatch">
+                        <label class="form-check-label" for="globalMatch">全局匹配 (g)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="multiline">
+                        <label class="form-check-label" for="multiline">多行模式 (m)</label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="replaceAll" checked>
+                        <label class="form-check-label" for="replaceAll">
+                            替换所有匹配项（普通模式下生效）
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="replaceBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-search me-1"></i>
+                            执行替换
+                        </button>
+                        <button id="countBtn" class="btn btn-info me-2">
+                            <i class="bi bi-hash me-1"></i>
+                            统计匹配
+                        </button>
+                    </div>
+                    <div>
+                        <button id="swapBtn" class="btn btn-info me-2">
+                            <i class="bi bi-arrow-left-right me-1"></i>
+                            交换内容
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="outputText" class="form-label">输出结果</label>
+                    <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <strong>匹配统计:</strong> 
+                            找到 <span id="matchCount">0</span> 个匹配项
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于文本替换</h5>
+            </div>
+            <div class="card-body">
+                <h6>功能说明</h6>
+                <p>
+                    文本替换工具可以帮助用户在文本中查找并替换指定内容，支持普通文本替换和正则表达式替换两种模式。
+                </p>
+                
+                <h6>替换模式</h6>
+                <ul>
+                    <li><strong>普通模式：</strong>按字面意思查找和替换文本</li>
+                    <li><strong>正则表达式模式：</strong>使用正则表达式进行高级查找和替换</li>
+                </ul>
+                
+                <h6>正则表达式选项</h6>
+                <ul>
+                    <li><strong>忽略大小写 (i)：</strong>匹配时忽略字母大小写</li>
+                    <li><strong>全局匹配 (g)：</strong>替换所有匹配项，而不是仅替换第一个</li>
+                    <li><strong>多行模式 (m)：</strong>将 ^ 和 $ 匹配应用于每一行的开头和结尾</li>
+                </ul>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>批量修改代码或配置文件中的变量名</li>
+                    <li>清理日志文件中的敏感信息</li>
+                    <li>格式化文本数据</li>
+                    <li>使用正则表达式进行复杂模式匹配和替换</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>在输入框中输入需要处理的文本</li>
+                    <li>在"查找文本"框中输入要查找的内容</li>
+                    <li>在"替换文本"框中输入替换后的内容</li>
+                    <li>选择替换模式（普通或正则表达式）</li>
+                    <li>如使用正则表达式，可根据需要选择匹配选项</li>
+                    <li>点击"执行替换"按钮进行替换操作</li>
+                    <li>也可先点击"统计匹配"查看匹配数量</li>
+                    <li>使用"复制结果"按钮将结果复制到剪贴板</li>
+                </ol>
+                
+                <h6>正则表达式示例</h6>
+                <ul>
+                    <li><strong>\d+</strong> 匹配一个或多个数字</li>
+                    <li><strong>[a-zA-Z]+</strong> 匹配一个或多个字母</li>
+                    <li><strong>\b\w+@\w+\.\w+\b</strong> 匹配电子邮件地址</li>
+                    <li><strong>(\d{4})-(\d{2})-(\d{2})</strong> 匹配日期格式，并可通过 $1/$2/$3 引用分组</li>
+                </ul>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>使用正则表达式时要注意语法正确性</li>
+                    <li>正则表达式模式下，替换文本中可使用 $1, $2 等引用捕获组</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const searchText = document.getElementById('searchText');
+            const replaceText = document.getElementById('replaceText');
+            const normalMode = document.getElementById('normalMode');
+            const regexMode = document.getElementById('regexMode');
+            const regexOptions = document.getElementById('regexOptions');
+            const caseInsensitive = document.getElementById('caseInsensitive');
+            const globalMatch = document.getElementById('globalMatch');
+            const multiline = document.getElementById('multiline');
+            const replaceAll = document.getElementById('replaceAll');
+            const matchCount = document.getElementById('matchCount');
+            
+            // 模式切换
+            regexMode.addEventListener('change', function() {
+                regexOptions.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            normalMode.addEventListener('change', function() {
+                regexOptions.style.display = this.checked ? 'none' : 'block';
+            });
+            
+            // 执行替换
+            document.getElementById('replaceBtn').addEventListener('click', function() {
+                try {
+                    const text = inputText.value;
+                    const search = searchText.value;
+                    const replace = replaceText.value;
+                    const isRegex = regexMode.checked;
+                    const isGlobal = globalMatch.checked || !isRegex; // 正则模式下看选项，普通模式下默认全局
+                    const isCaseInsensitive = caseInsensitive.checked;
+                    const isMultiline = multiline.checked;
+                    
+                    if (!text) {
+                        showToast('请输入要处理的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!search) {
+                        showToast('请输入要查找的文本', 'error');
+                        return;
+                    }
+                    
+                    let result = '';
+                    let count = 0;
+                    
+                    if (isRegex) {
+                        // 正则表达式模式
+                        try {
+                            let flags = '';
+                            if (isGlobal) flags += 'g';
+                            if (isCaseInsensitive) flags += 'i';
+                            if (isMultiline) flags += 'm';
+                            
+                            const regex = new RegExp(search, flags);
+                            result = text.replace(regex, replace);
+                            
+                            // 统计匹配数量
+                            const matches = text.match(new RegExp(search, flags.replace('g', '')));
+                            count = matches ? (isGlobal ? matches.length : (matches ? 1 : 0)) : 0;
+                        } catch (e) {
+                            showToast('正则表达式语法错误: ' + e.message, 'error');
+                            return;
+                        }
+                    } else {
+                        // 普通模式
+                        if (replaceAll.checked) {
+                            // 转义特殊字符
+                            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const regex = new RegExp(escapedSearch, 'g');
+                            result = text.replace(regex, replace);
+                            count = (text.match(regex) || []).length;
+                        } else {
+                            result = text.replace(search, replace);
+                            count = text.indexOf(search) >= 0 ? 1 : 0;
+                        }
+                    }
+                    
+                    outputText.value = result;
+                    matchCount.textContent = count;
+                } catch (e) {
+                    showToast('替换出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 统计匹配
+            document.getElementById('countBtn').addEventListener('click', function() {
+                try {
+                    const text = inputText.value;
+                    const search = searchText.value;
+                    const isRegex = regexMode.checked;
+                    const isGlobal = globalMatch.checked;
+                    const isCaseInsensitive = caseInsensitive.checked;
+                    const isMultiline = multiline.checked;
+                    
+                    if (!text) {
+                        showToast('请输入要处理的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!search) {
+                        showToast('请输入要查找的文本', 'error');
+                        return;
+                    }
+                    
+                    let count = 0;
+                    
+                    if (isRegex) {
+                        // 正则表达式模式
+                        try {
+                            let flags = '';
+                            if (isGlobal) flags += 'g';
+                            if (isCaseInsensitive) flags += 'i';
+                            if (isMultiline) flags += 'm';
+                            
+                            const regex = new RegExp(search, flags);
+                            const matches = text.match(regex);
+                            count = matches ? matches.length : 0;
+                        } catch (e) {
+                            showToast('正则表达式语法错误: ' + e.message, 'error');
+                            return;
+                        }
+                    } else {
+                        // 普通模式
+                        if (replaceAll.checked) {
+                            // 转义特殊字符
+                            const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const regex = new RegExp(escapedSearch, 'g');
+                            count = (text.match(regex) || []).length;
+                        } else {
+                            count = text.indexOf(search) >= 0 ? 1 : 0;
+                        }
+                    }
+                    
+                    matchCount.textContent = count;
+                    showToast(`找到 ${count} 个匹配项`, 'info');
+                } catch (e) {
+                    showToast('统计出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+                searchText.value = '';
+                replaceText.value = '';
+                matchCount.textContent = '0';
+            });
+            
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

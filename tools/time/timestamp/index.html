@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间戳转换工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">时间工具</li>
+                <li class="breadcrumb-item active" aria-current="page">时间戳转换工具</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">时间戳转换工具</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        时间转时间戳
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="dateTimeInput" class="form-label">日期时间</label>
+                                            <input type="datetime-local" class="form-control" id="dateTimeInput">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="timestampOutput" class="form-label">时间戳（秒）</label>
+                                            <input type="text" class="form-control" id="timestampOutput" readonly>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="milliTimestampOutput" class="form-label">时间戳（毫秒）</label>
+                                            <input type="text" class="form-control" id="milliTimestampOutput" readonly>
+                                        </div>
+                                        
+                                        <button id="convertToTimestampBtn" class="btn btn-primary">
+                                            <i class="bi bi-arrow-down-circle me-1"></i>
+                                            转换为时间戳
+                                        </button>
+                                        <button id="copyTimestampBtn" class="btn btn-outline-secondary ms-2">
+                                            <i class="bi bi-clipboard me-1"></i>
+                                            复制时间戳
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        时间戳转时间
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="timestampInput" class="form-label">时间戳</label>
+                                            <input type="text" class="form-control" id="timestampInput" placeholder="请输入时间戳">
+                                            <div class="form-text">支持秒或毫秒时间戳</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="dateOutput" class="form-label">转换结果</label>
+                                            <input type="text" class="form-control" id="dateOutput" readonly>
+                                        </div>
+                                        
+                                        <button id="convertToDateBtn" class="btn btn-primary">
+                                            <i class="bi bi-arrow-down-circle me-1"></i>
+                                            转换为日期时间
+                                        </button>
+                                        <button id="copyDateBtn" class="btn btn-outline-secondary ms-2">
+                                            <i class="bi bi-clipboard me-1"></i>
+                                            复制结果
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center mt-3">
+                            <button id="nowBtn" class="btn btn-info me-2">
+                                <i class="bi bi-clock me-1"></i>
+                                当前时间
+                            </button>
+                            <button id="clearAllBtn" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i>
+                                清空所有
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">关于 时间戳</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5>什么是 时间戳</h5>
+                        <p class="card-text">
+                            时间戳是指格林威治时间1970年01月01日00时00分00秒起至现在的总秒数或总毫秒数。它是一种计算机可读的时间表示方式，在编程、日志记录、数据库等领域广泛应用。
+                        </p>
+                        
+                        <h5>时间戳的类型</h5>
+                        <ul>
+                            <li><strong>秒级时间戳：</strong>从1970年1月1日00:00:00 UTC开始计算的秒数，一般为10位数字</li>
+                            <li><strong>毫秒级时间戳：</strong>从1970年1月1日00:00:00 UTC开始计算的毫秒数，一般为13位数字</li>
+                        </ul>
+                        
+                        <h5>如何使用本工具</h5>
+                        <ol>
+                            <li><strong>时间转时间戳：</strong>选择日期时间，点击"转换为时间戳"按钮，即可获得对应的秒级和毫秒级时间戳。</li>
+                            <li><strong>时间戳转时间：</strong>输入时间戳（支持秒或毫秒），点击"转换为日期时间"按钮，即可获得对应的时间。</li>
+                            <li><strong>当前时间：</strong>点击"当前时间"按钮，可以获取当前时间的时间戳和日期时间。</li>
+                            <li><strong>清空所有：</strong>点击"清空所有"按钮可以清空所有输入和输出框的内容。</li>
+                        </ol>
+                        
+                        <h5>常见应用场景</h5>
+                        <ul>
+                            <li>在程序开发中处理时间数据</li>
+                            <li>查看日志文件中的时间戳信息</li>
+                            <li>数据库中时间字段的转换</li>
+                            <li>API接口中时间参数的处理</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 为时间戳工具添加特定的 Toast 样式
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里添加特定于页面的 Toast 样式调整
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取元素
+            const dateTimeInput = document.getElementById('dateTimeInput');
+            const timestampOutput = document.getElementById('timestampOutput');
+            const milliTimestampOutput = document.getElementById('milliTimestampOutput');
+            const timestampInput = document.getElementById('timestampInput');
+            const dateOutput = document.getElementById('dateOutput');
+            
+            // 设置默认时间为当前时间
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            dateTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            // 时间转时间戳
+            document.getElementById('convertToTimestampBtn').addEventListener('click', function() {
+                try {
+                    const date = new Date(dateTimeInput.value);
+                    if (isNaN(date.getTime())) {
+                        showToast('请输入有效的时间', 'error');
+                        return;
+                    }
+                    
+                    const timestamp = Math.floor(date.getTime() / 1000);
+                    const milliTimestamp = date.getTime();
+                    
+                    timestampOutput.value = timestamp;
+                    milliTimestampOutput.value = milliTimestamp;
+                } catch (e) {
+                    showToast('转换出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 时间戳转时间
+            document.getElementById('convertToDateBtn').addEventListener('click', function() {
+                try {
+                    let timestamp = timestampInput.value.trim();
+                    if (!timestamp) {
+                        showToast('请输入时间戳', 'error');
+                        return;
+                    }
+                    
+                    // 判断是秒还是毫秒
+                    if (timestamp.length === 10) {
+                        timestamp = parseInt(timestamp) * 1000;
+                    } else if (timestamp.length === 13) {
+                        timestamp = parseInt(timestamp);
+                    } else {
+                        showToast('请输入有效的时间戳（10位或13位数字）', 'error');
+                        return;
+                    }
+                    
+                    const date = new Date(timestamp);
+                    if (isNaN(date.getTime())) {
+                        showToast('请输入有效的时间戳', 'error');
+                        return;
+                    }
+                    
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    const seconds = String(date.getSeconds()).padStart(2, '0');
+                    
+                    dateOutput.value = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                } catch (e) {
+                    showToast('转换出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 当前时间
+            document.getElementById('nowBtn').addEventListener('click', function() {
+                const now = new Date();
+                
+                // 更新时间选择器
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                dateTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                
+                // 更新时间戳
+                const timestamp = Math.floor(now.getTime() / 1000);
+                const milliTimestamp = now.getTime();
+                timestampOutput.value = timestamp;
+                milliTimestampOutput.value = milliTimestamp;
+                
+                // 更新时间显示
+                const displayYear = now.getFullYear();
+                const displayMonth = String(now.getMonth() + 1).padStart(2, '0');
+                const displayDay = String(now.getDate()).padStart(2, '0');
+                const displayHours = String(now.getHours()).padStart(2, '0');
+                const displayMinutes = String(now.getMinutes()).padStart(2, '0');
+                const displaySeconds = String(now.getSeconds()).padStart(2, '0');
+                
+                dateOutput.value = `${displayYear}-${displayMonth}-${displayDay} ${displayHours}:${displayMinutes}:${displaySeconds}`;
+                
+                // 同时更新时间戳输入框
+                timestampInput.value = milliTimestamp;
+                
+                // 添加提示信息
+                showToast('已更新为当前时间', 'success');
+            });
+            
+            // 复制时间戳
+            document.getElementById('copyTimestampBtn').addEventListener('click', function() {
+                if (milliTimestampOutput.value) {
+                    navigator.clipboard.writeText(milliTimestampOutput.value).then(() => {
+                        showToast('已复制到剪贴板', 'success');
+                    }).catch(err => {
+                        showToast('复制失败: ' + err, 'error');
+                    });
+                } else {
+                    showToast('没有可复制的时间戳', 'warning');
+                }
+            });
+            
+            // 复制日期结果
+            document.getElementById('copyDateBtn').addEventListener('click', function() {
+                if (dateOutput.value) {
+                    navigator.clipboard.writeText(dateOutput.value).then(() => {
+                        showToast('已复制到剪贴板', 'success');
+                    }).catch(err => {
+                        showToast('复制失败: ' + err, 'error');
+                    });
+                } else {
+                    showToast('没有可复制的结果', 'warning');
+                }
+            });
+            
+            // 清空所有
+            document.getElementById('clearAllBtn').addEventListener('click', function() {
+                dateTimeInput.value = '';
+                timestampOutput.value = '';
+                milliTimestampOutput.value = '';
+                timestampInput.value = '';
+                dateOutput.value = '';
+            });
+        });
+    </script>
+</body>
+</html>

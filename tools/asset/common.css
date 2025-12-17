@@ -1,0 +1,75 @@
+/* 引入 Bootstrap Icons */
+/* 已在HTML中全局引入bootstrap-icons，无需在此重复引入 */
+
+
+.navbar .nav-link:focus,
+.navbar .nav-link:focus-visible,
+.navbar .nav-link.dropdown-toggle.show {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.navbar .dropdown-menu {
+    margin-top: 0.25rem;
+}
+
+/* 通用样式 */
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn {
+    border-radius: 4px;
+}
+
+.container-main {
+    min-height: calc(100vh - 56px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+
+/* 下拉菜单相关样式 */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    border: none;
+    outline: none;
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+    border: none;
+    outline: none;
+}
+
+.dropdown-item.active {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+/* 隐藏下拉菜单箭头 */
+.hide-caret::after {
+    display: none !important;
+}
+
+/* 按钮图标间距 */
+.btn i {
+    margin-right: 0.25rem;
+}
+
+/* Footer 样式 */
+.footer {
+    border-top: 1px solid #e7e7e7;
+    margin-top: 2rem;
+}
+
+/* 使用Bootstrap Toast样式，无需额外定义 */

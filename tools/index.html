@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具集</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .category-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .tool-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 100%;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .tool-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        
+        .tool-card .card-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1.25rem;
+        }
+        
+        .category-description {
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-link {
+            text-decoration: none;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .category-header i {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+        
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .tool-header i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+        
+        /* 为不同分类的工具卡片设置不同的背景色 */
+        .tool-category-0 .tool-card { background-color: #fff8f8; }
+        .tool-category-1 .tool-card { background-color: #f8fff9; }
+        .tool-category-2 .tool-card { background-color: #f8f9ff; }
+        .tool-category-3 .tool-card { background-color: #fff9f8; }
+        .tool-category-4 .tool-card { background-color: #f9f8ff; }
+        .tool-category-5 .tool-card { background-color: #fff8fb; }
+        .tool-category-6 .tool-card { background-color: #f8fdff; }
+        .tool-category-7 .tool-card { background-color: #fdfff8; }
+        .tool-category-8 .tool-card { background-color: #faf8ff; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <h1 class="mb-4">工具集</h1>
+        
+        <!-- 工具分类将在这里动态渲染 -->
+        <div id="tools-container" class="row">
+            <!-- 工具分类和工具将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./asset/navbar.js"></script>
+    <script src="./asset/footer.js"></script>
+    <script src="./asset/common.js"></script>
+    <script>
+        // 等待DOM加载完成后渲染工具分类
+        document.addEventListener('DOMContentLoaded', function() {
+            renderToolCategories();
+        });
+        
+        // 渲染工具分类
+        function renderToolCategories() {
+            const toolsContainer = document.getElementById('tools-container');
+            
+            // 检查navbarConfig是否存在
+            if (typeof navbarConfig === 'undefined' || !navbarConfig.categories) {
+                toolsContainer.innerHTML = '<div class="col-12"><div class="alert alert-warning">无法加载工具分类信息</div></div>';
+                return;
+            }
+            
+            // 生成工具分类HTML
+            let html = '';
+            navbarConfig.categories.forEach((category, categoryIndex) => {
+                html += `
+                <div class="col-12">
+                    <div class="card category-card mb-4">
+                        <div class="card-header">
+                            <div class="category-header">
+                                <i class="bi ${category.icon}"></i>
+                                <h4 class="mb-0">${category.name}</h4>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            ${category.description ? `<p class="category-description">${category.description}</p>` : ''}
+                            <div class="row tool-category-${categoryIndex % 9}">`;
+                
+                // 为每个工具项生成HTML
+                category.items.forEach(item => {
+                    html += `
+                                <div class="col-md-4 col-lg-3 mb-3">
+                                    <a href="${item.url}" class="card-link">
+                                        <div class="card tool-card">
+                                            <div class="card-body">
+                                                <div class="tool-header">
+                                                    <i class="bi ${item.icon}"></i>
+                                                    <h5 class="card-title mb-0">${item.name}</h5>
+                                                </div>
+                                                ${item.description ? `<p class="card-text">${item.description}</p>` : ''}
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>`;
+                });
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            
+            toolsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

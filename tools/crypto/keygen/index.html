@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA 密钥生成工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .key-container {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .key-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            min-height: 100px;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">RSA 密钥生成工具</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">RSA 密钥生成工具</h5>
+            </div>
+            <div class="card-body">
+                <form id="keyGenForm">
+                    <div class="mb-3">
+                        <label for="keySize" class="form-label">密钥长度</label>
+                        <select class="form-select" id="keySize">
+                            <option value="1024">1024 位</option>
+                            <option value="2048" selected>2048 位</option>
+                            <option value="4096">4096 位</option>
+                        </select>
+                        <div class="form-text">密钥长度越长安全性越高，但生成时间也会相应增加</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="generateBtn">
+                        <i class="bi bi-key me-1"></i>
+                        生成 RSA 密钥对
+                    </button>
+                    
+                    <div class="spinner-border ms-2 d-none" role="status" id="loadingSpinner">
+                        <span class="visually-hidden">正在生成...</span>
+                    </div>
+                </form>
+                
+                <div class="mt-4 d-none" id="resultSection">
+                    <div class="key-container">
+                        <div class="key-header">
+                            <h6 class="mb-0">公钥 (Public Key)</h6>
+                            <button class="btn btn-sm btn-outline-primary copy-btn" data-target="publicKey">
+                                <i class="bi bi-clipboard me-1"></i>
+                                复制
+                            </button>
+                        </div>
+                        <div class="key-content" id="publicKey"></div>
+                    </div>
+                    
+                    <div class="key-container">
+                        <div class="key-header">
+                            <h6 class="mb-0">私钥 (Private Key)</h6>
+                            <button class="btn btn-sm btn-outline-primary copy-btn" data-target="privateKey">
+                                <i class="bi bi-clipboard me-1"></i>
+                                复制
+                            </button>
+                        </div>
+                        <div class="key-content" id="privateKey"></div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="bi bi-exclamation-triangle-fill me-1"></i> 安全提醒</h6>
+                        <p class="mb-0">
+                            请妥善保管您的私钥，不要将其泄露给任何人。私钥一旦丢失将无法恢复，
+                            一旦泄露将导致使用该密钥加密的数据面临安全风险。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于 RSA 密钥</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是 RSA 密钥对</h6>
+                <p>
+                    RSA 密钥对包含一个公钥和一个私钥。公钥可以公开分享，用于加密数据或验证签名；
+                    私钥必须严格保密，用于解密数据或生成签名。
+                </p>
+                
+                <h6>RSA 密钥长度选择</h6>
+                <ul>
+                    <li><strong>1024 位：</strong>安全性较低，不推荐用于生产环境</li>
+                    <li><strong>2048 位：</strong>当前推荐的最小密钥长度，提供较好的安全性</li>
+                    <li><strong>4096 位：</strong>高安全性要求场景的选择，但性能开销较大</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>选择合适的密钥长度（推荐 2048 位或更高）</li>
+                    <li>点击"生成 RSA 密钥对"按钮</li>
+                    <li>等待密钥生成完成（可能需要几秒到几十秒）</li>
+                    <li>复制并妥善保存生成的公钥和私钥</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>密钥生成过程完全在浏览器中进行，不会上传到任何服务器</li>
+                    <li>刷新页面或关闭浏览器将丢失生成的密钥</li>
+                    <li>请勿在不安全的网络环境下生成重要密钥</li>
+                    <li>对于生产环境使用，建议使用专业的密钥管理工具</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/node-forge@1.3.1/dist/forge.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const keyGenForm = document.getElementById('keyGenForm');
+            const generateBtn = document.getElementById('generateBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultSection = document.getElementById('resultSection');
+            const publicKeyElement = document.getElementById('publicKey');
+            const privateKeyElement = document.getElementById('privateKey');
+            
+            // 生成密钥对
+            keyGenForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const keySize = parseInt(document.getElementById('keySize').value);
+                
+                // 显示加载状态
+                generateBtn.disabled = true;
+                loadingSpinner.classList.remove('d-none');
+                resultSection.classList.add('d-none');
+                
+                // 在下一个事件循环中开始生成，确保 UI 更新
+                setTimeout(() => {
+                    try {
+                        // 生成 RSA 密钥对
+                        const keypair = forge.pki.rsa.generateKeyPair(keySize);
+                        
+                        // 转换为 PEM 格式
+                        const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
+                        const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
+                        
+                        // 显示结果
+                        publicKeyElement.textContent = publicKeyPem;
+                        privateKeyElement.textContent = privateKeyPem;
+                        
+                        // 显示结果区域
+                        resultSection.classList.remove('d-none');
+                    } catch (error) {
+                        showToast('密钥生成失败: ' + error.message, 'error');
+                    } finally {
+                        // 恢复按钮状态
+                        generateBtn.disabled = false;
+                        loadingSpinner.classList.add('d-none');
+                    }
+                }, 10);
+            });
+            
+            // 复制功能
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        try {
+                            await navigator.clipboard.writeText(targetElement.textContent);
+                            showToast('已复制到剪贴板', 'success');
+                        } catch (err) {
+                            showToast('复制失败: ' + err.message, 'error');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

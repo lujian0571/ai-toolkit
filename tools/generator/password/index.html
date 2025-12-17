@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码生成器 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">生成工具</li>
+                <li class="breadcrumb-item active" aria-current="page">密码生成</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">密码设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="passwordLength" class="form-label">密码长度: <span id="lengthValue">12</span> 位</label>
+                            <input type="range" class="form-range" min="4" max="50" step="1" value="12" id="passwordLength">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">字符类型</label>
+                            <div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="includeUppercase" checked>
+                                    <label class="form-check-label" for="includeUppercase">
+                                        大写字母 (A-Z)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="includeLowercase" checked>
+                                    <label class="form-check-label" for="includeLowercase">
+                                        小写字母 (a-z)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="includeNumbers" checked>
+                                    <label class="form-check-label" for="includeNumbers">
+                                        数字 (0-9)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="includeSymbols" checked>
+                                    <label class="form-check-label" for="includeSymbols">
+                                        符号 (!@#$%^&*)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="excludeSimilar">
+                                <label class="form-check-label" for="excludeSimilar">
+                                    排除相似字符 (0, O, l, I)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="excludeAmbiguous">
+                                <label class="form-check-label" for="excludeAmbiguous">
+                                    排除模糊字符 ({}, []等)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="generateBtn">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            生成密码
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0 d-flex justify-content-between align-items-center">
+                            <span>生成结果</span>
+                            <small id="strengthIndicator">强度: <span id="strengthText">-</span></small>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2" id="passwordGrid">
+                            <!-- 2列5行 密码网格 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">密码学与密码强度说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>密码学基础</h6>
+                        <p>密码是保护信息安全的重要手段。一个好的密码应当具备以下特征：</p>
+                        <ul>
+                            <li><strong>长度：</strong>密码越长，破解难度越大。建议至少使用12位以上的密码。</li>
+                            <li><strong>复杂性：</strong>包含多种字符类型（大写字母、小写字母、数字、符号）可以显著增加密码的复杂性。</li>
+                            <li><strong>随机性：</strong>避免使用有意义的词汇、个人信息（如姓名、生日）或常见的模式。</li>
+                            <li><strong>唯一性：</strong>为每个账户使用不同的密码，防止一个账户被破解后影响其他账户。</li>
+                        </ul>
+                        
+                        <h6>密码强度评估</h6>
+                        <p>密码强度通常由以下几个因素决定：</p>
+                        <ul>
+                            <li><strong>熵值：</strong>衡量密码随机性的指标，熵值越高，密码越难预测。</li>
+                            <li><strong>字符集大小：</strong>使用的字符类型越多，密码空间越大，破解难度越高。</li>
+                            <li><strong>长度：</strong>密码长度是影响强度的最重要因素之一。</li>
+                            <li><strong>模式：</strong>避免使用可预测的模式，如连续字符、重复字符等。</li>
+                        </ul>
+                        
+                        <h6>密码安全建议</h6>
+                        <ol>
+                            <li>使用密码管理器来生成和存储复杂的唯一密码</li>
+                            <li>启用双重身份验证（2FA）以增加额外的安全层</li>
+                            <li>定期更换重要账户的密码</li>
+                            <li>不要在多个网站上重复使用相同的密码</li>
+                            <li>避免在密码中使用个人信息，如姓名、生日、身份证号等</li>
+                            <li>警惕钓鱼攻击，不要在不安全的网站上输入密码</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+            
+            // 生成初始密码
+            generatePassword();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 长度滑块事件
+            document.getElementById('passwordLength').addEventListener('input', function() {
+                document.getElementById('lengthValue').textContent = this.value;
+                generatePassword();
+            });
+            
+            // 字符类型选择事件
+            document.getElementById('includeUppercase').addEventListener('change', generatePassword);
+            document.getElementById('includeLowercase').addEventListener('change', generatePassword);
+            document.getElementById('includeNumbers').addEventListener('change', generatePassword);
+            document.getElementById('includeSymbols').addEventListener('change', generatePassword);
+            
+            // 排除选项事件
+            document.getElementById('excludeSimilar').addEventListener('change', generatePassword);
+            document.getElementById('excludeAmbiguous').addEventListener('change', generatePassword);
+            
+            // 生成按钮事件
+            document.getElementById('generateBtn').addEventListener('click', generatePassword);
+        }
+        
+        // 生成密码
+        function generatePassword() {
+            const length = parseInt(document.getElementById('passwordLength').value);
+            const includeUppercase = document.getElementById('includeUppercase').checked;
+            const includeLowercase = document.getElementById('includeLowercase').checked;
+            const includeNumbers = document.getElementById('includeNumbers').checked;
+            const includeSymbols = document.getElementById('includeSymbols').checked;
+            const excludeSimilar = document.getElementById('excludeSimilar').checked;
+            const excludeAmbiguous = document.getElementById('excludeAmbiguous').checked;
+            
+            // 字符集定义
+            let uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let lowercase = 'abcdefghijklmnopqrstuvwxyz';
+            let numbers = '0123456789';
+            let symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            // 排除相似字符
+            if (excludeSimilar) {
+                uppercase = uppercase.replace(/[IO]/g, '');
+                lowercase = lowercase.replace(/[il]/g, '');
+                numbers = numbers.replace(/[01]/g, '');
+            }
+            
+            // 排除模糊字符
+            if (excludeAmbiguous) {
+                symbols = symbols.replace(/[{}[\]()]/g, '');
+            }
+            
+            // 构建字符集
+            let charset = '';
+            if (includeUppercase) charset += uppercase;
+            if (includeLowercase) charset += lowercase;
+            if (includeNumbers) charset += numbers;
+            if (includeSymbols) charset += symbols;
+            
+            // 检查是否有选择字符类型
+            if (charset.length === 0) {
+                document.getElementById('passwordGrid').innerHTML = '<div class="col-12"><div class="alert alert-warning">请至少选择一种字符类型</div></div>';
+                displayPasswordStrength(0, false, false, false, false);
+                return;
+            }
+            
+            // 生成10组密码
+            const passwords = [];
+            for (let i = 0; i < 10; i++) {
+                passwords.push(generateSinglePassword(length, charset, includeUppercase, includeLowercase, includeNumbers, includeSymbols, uppercase, lowercase, numbers, symbols));
+            }
+            
+            // 显示密码网格
+            displayPasswordGrid(passwords);
+            
+            // 显示密码强度
+            displayPasswordStrength(length, includeUppercase, includeLowercase, includeNumbers, includeSymbols);
+        }
+        
+        // 生成单个密码
+        function generateSinglePassword(length, charset, includeUppercase, includeLowercase, includeNumbers, includeSymbols, uppercase, lowercase, numbers, symbols) {
+            // 生成密码
+            let password = '';
+            const charsetLength = charset.length;
+            const randomValues = new Uint32Array(length);
+            window.crypto.getRandomValues(randomValues);
+            
+            for (let i = 0; i < length; i++) {
+                password += charset[randomValues[i] % charsetLength];
+            }
+            
+            // 确保密码包含每种选定的字符类型
+            let missingTypes = [];
+            if (includeUppercase && !/[A-Z]/.test(password)) missingTypes.push(uppercase);
+            if (includeLowercase && !/[a-z]/.test(password)) missingTypes.push(lowercase);
+            if (includeNumbers && !/[0-9]/.test(password)) missingTypes.push(numbers);
+            if (includeSymbols && !/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) missingTypes.push(symbols);
+            
+            // 如果缺少某些类型的字符，则替换部分字符
+            if (missingTypes.length > 0) {
+                const passwordArray = password.split('');
+                for (let i = 0; i < missingTypes.length; i++) {
+                    const randomIndex = Math.floor(Math.random() * length);
+                    const randomChar = missingTypes[i][Math.floor(Math.random() * missingTypes[i].length)];
+                    passwordArray[randomIndex] = randomChar;
+                }
+                password = passwordArray.join('');
+            }
+            
+            return password;
+        }
+        
+        // 显示密码网格
+        function displayPasswordGrid(passwords) {
+            const grid = document.getElementById('passwordGrid');
+            grid.innerHTML = '';
+            
+            passwords.forEach((password, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-6';
+                
+                col.innerHTML = `
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" value="${password}" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button" data-password="${password}">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(col);
+            });
+            
+            // 为复制按钮添加事件监听器
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const password = this.getAttribute('data-password');
+                    copyPasswordToClipboard(password);
+                });
+            });
+        }
+        
+        // 复制单个密码到剪贴板
+        function copyPasswordToClipboard(password) {
+            if (password) {
+                navigator.clipboard.writeText(password).then(function() {
+                    showToast('密码已复制到剪贴板', 'success');
+                }, function() {
+                    showToast('复制失败', 'error');
+                });
+            }
+        }
+        
+        // 显示密码强度
+        function displayPasswordStrength(length, hasUppercase, hasLowercase, hasNumbers, hasSymbols) {
+            // 计算强度
+            let strength = 0;
+            let factors = [];
+            
+            // 长度因素
+            strength += Math.min(length * 2, 50);
+            factors.push(`长度(${length}位)`);
+            
+            // 字符类型因素
+            if (hasUppercase) {
+                strength += 10;
+                factors.push('大写字母');
+            }
+            if (hasLowercase) {
+                strength += 10;
+                factors.push('小写字母');
+            }
+            if (hasNumbers) {
+                strength += 10;
+                factors.push('数字');
+            }
+            if (hasSymbols) {
+                strength += 20;
+                factors.push('符号');
+            }
+            
+            // 限制最大值
+            strength = Math.min(strength, 100);
+            
+            // 更新强度显示
+            const strengthText = document.getElementById('strengthText');
+            
+            if (factors.length === 1 && length === 0) {
+                strengthText.textContent = '无字符类型';
+                strengthText.className = 'text-danger';
+            } else {
+                // 根据强度设置颜色和文本
+                if (strength < 40) {
+                    strengthText.textContent = `弱 (${strength}/100)`;
+                    strengthText.className = 'text-danger';
+                } else if (strength < 70) {
+                    strengthText.textContent = `一般 (${strength}/100)`;
+                    strengthText.className = 'text-warning';
+                } else if (strength < 90) {
+                    strengthText.textContent = `较强 (${strength}/100)`;
+                    strengthText.className = 'text-info';
+                } else {
+                    strengthText.textContent = `强 (${strength}/100)`;
+                    strengthText.className = 'text-success';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

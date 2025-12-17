@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单位换算器</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">数据转换</li>
+                <li class="breadcrumb-item active" aria-current="page">单位换算</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">单位换算工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <label for="inputValue" class="form-label">输入值</label>
+                        <input type="number" class="form-control" id="inputValue" placeholder="请输入数值" value="1">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="inputUnit" class="form-label">输入单位</label>
+                        <select class="form-select" id="inputUnit">
+                            <!-- 单位选项将在JavaScript中填充 -->
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button id="swapBtn" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <label for="outputUnit" class="form-label">输出单位</label>
+                        <select class="form-select" id="outputUnit">
+                            <!-- 单位选项将在JavaScript中填充 -->
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="outputValue" class="form-label">换算结果</label>
+                        <input type="text" class="form-control" id="outputValue" readonly>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button id="convertBtn" class="btn btn-primary w-100">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="unitCategory" class="form-label">单位类别</label>
+                        <select class="form-select" id="unitCategory">
+                            <option value="length">长度</option>
+                            <option value="weight">重量</option>
+                            <option value="temperature" selected>温度</option>
+                            <option value="area">面积</option>
+                            <option value="volume">体积</option>
+                            <option value="speed">速度</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于单位换算</h5>
+            </div>
+            <div class="card-body">
+                <h6>单位换算简介</h6>
+                <p>
+                    单位换算是将一个物理量从一种单位制转换为另一种单位制的过程。在日常生活和科学研究中，
+                    我们经常需要在不同的单位之间进行换算。
+                </p>
+                
+                <h6>常见的单位类别</h6>
+                <ul>
+                    <li><strong>长度：</strong>米(m)、千米(km)、厘米(cm)、毫米(mm)、英寸(in)、英尺(ft)、码(yd)、英里(mi)等</li>
+                    <li><strong>重量：</strong>克(g)、千克(kg)、吨(t)、盎司(oz)、磅(lb)等</li>
+                    <li><strong>温度：</strong>摄氏度(°C)、华氏度(°F)、开尔文(K)等</li>
+                    <li><strong>面积：</strong>平方米(m²)、平方千米(km²)、公顷(ha)、平方英尺(ft²)等</li>
+                    <li><strong>体积：</strong>立方米(m³)、升(L)、毫升(mL)、加仑(gal)等</li>
+                    <li><strong>速度：</strong>米/秒(m/s)、千米/小时(km/h)、英里/小时(mph)等</li>
+                </ul>
+                
+                <h6>换算原理</h6>
+                <p>
+                    单位换算基于数学比例关系。每个单位都有相对于标准单位的换算系数。
+                    通过乘以或除以这些系数，我们可以实现在不同单位之间的转换。
+                </p>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>国际贸易中的计量单位转换</li>
+                    <li>科学研究中的数据标准化</li>
+                    <li>工程设计中的单位统一</li>
+                    <li>旅行中的距离、温度等信息理解</li>
+                    <li>烹饪中的食材用量转换</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>选择要换算的单位类别</li>
+                    <li>输入要转换的数值</li>
+                    <li>选择输入单位和目标单位</li>
+                    <li>点击转换按钮查看结果</li>
+                    <li>使用交换按钮可以快速交换输入和输出单位</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>输入数值必须是有效的数字</li>
+                    <li>工具支持常见的单位换算，对于特殊需求可能需要专业工具</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                    <li>温度换算是特殊情况，不使用简单的比例换算</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 定义单位换算数据
+            const units = {
+                length: {
+                    name: "长度",
+                    units: {
+                        "m": { name: "米", factor: 1 },
+                        "km": { name: "千米", factor: 1000 },
+                        "cm": { name: "厘米", factor: 0.01 },
+                        "mm": { name: "毫米", factor: 0.001 },
+                        "in": { name: "英寸", factor: 0.0254 },
+                        "ft": { name: "英尺", factor: 0.3048 },
+                        "yd": { name: "码", factor: 0.9144 },
+                        "mi": { name: "英里", factor: 1609.344 }
+                    }
+                },
+                weight: {
+                    name: "重量",
+                    units: {
+                        "g": { name: "克", factor: 1 },
+                        "kg": { name: "千克", factor: 1000 },
+                        "t": { name: "吨", factor: 1000000 },
+                        "oz": { name: "盎司", factor: 28.3495 },
+                        "lb": { name: "磅", factor: 453.592 }
+                    }
+                },
+                temperature: {
+                    name: "温度",
+                    units: {
+                        "c": { name: "摄氏度", factor: 1 },
+                        "f": { name: "华氏度", factor: 1 },
+                        "k": { name: "开尔文", factor: 1 }
+                    }
+                },
+                area: {
+                    name: "面积",
+                    units: {
+                        "m2": { name: "平方米", factor: 1 },
+                        "km2": { name: "平方千米", factor: 1000000 },
+                        "ha": { name: "公顷", factor: 10000 },
+                        "acre": { name: "英亩", factor: 4046.86 },
+                        "ft2": { name: "平方英尺", factor: 0.092903 }
+                    }
+                },
+                volume: {
+                    name: "体积",
+                    units: {
+                        "l": { name: "升", factor: 1 },
+                        "ml": { name: "毫升", factor: 0.001 },
+                        "m3": { name: "立方米", factor: 1000 },
+                        "gal": { name: "加仑(美制)", factor: 3.78541 },
+                        "qt": { name: "夸脱(美制)", factor: 0.946353 }
+                    }
+                },
+                speed: {
+                    name: "速度",
+                    units: {
+                        "mps": { name: "米/秒", factor: 1 },
+                        "kph": { name: "千米/小时", factor: 0.277778 },
+                        "mph": { name: "英里/小时", factor: 0.44704 },
+                        "knot": { name: "节", factor: 0.514444 }
+                    }
+                }
+            };
+            
+            const inputValue = document.getElementById('inputValue');
+            const inputUnit = document.getElementById('inputUnit');
+            const outputUnit = document.getElementById('outputUnit');
+            const outputValue = document.getElementById('outputValue');
+            const unitCategory = document.getElementById('unitCategory');
+            
+            // 初始化单位选择
+            function initUnits() {
+                const category = unitCategory.value;
+                const unitData = units[category];
+                
+                // 清空选项
+                inputUnit.innerHTML = '';
+                outputUnit.innerHTML = '';
+                
+                // 添加选项
+                for (const unit in unitData.units) {
+                    const option1 = document.createElement('option');
+                    option1.value = unit;
+                    option1.textContent = unitData.units[unit].name;
+                    inputUnit.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = unit;
+                    option2.textContent = unitData.units[unit].name;
+                    outputUnit.appendChild(option2);
+                }
+                
+                // 设置默认选中项
+                if (category === 'temperature') {
+                    inputUnit.value = 'c';
+                    outputUnit.value = 'f';
+                } else {
+                    // 设置第二个单位为默认输出单位
+                    const unitKeys = Object.keys(unitData.units);
+                    if (unitKeys.length > 1) {
+                        outputUnit.value = unitKeys[1];
+                    }
+                }
+                
+                convert();
+            }
+            
+            // 执行换算
+            function convert() {
+                try {
+                    const value = parseFloat(inputValue.value);
+                    const category = unitCategory.value;
+                    
+                    if (isNaN(value)) {
+                        outputValue.value = '';
+                        return;
+                    }
+                    
+                    if (category === 'temperature') {
+                        convertTemperature(value);
+                    } else {
+                        convertStandard(value);
+                    }
+                } catch (e) {
+                    showToast('换算出错: ' + e.message, 'error');
+                }
+            }
+            
+            // 标准单位换算
+            function convertStandard(value) {
+                const category = unitCategory.value;
+                const inputUnitValue = inputUnit.value;
+                const outputUnitValue = outputUnit.value;
+                const unitData = units[category];
+                
+                // 转换为基准单位（国际标准单位）
+                const baseValue = value * unitData.units[inputUnitValue].factor;
+                
+                // 转换为目标单位
+                const result = baseValue / unitData.units[outputUnitValue].factor;
+                
+                outputValue.value = formatResult(result);
+            }
+            
+            // 温度单位换算
+            function convertTemperature(value) {
+                const inputUnitValue = inputUnit.value;
+                const outputUnitValue = outputUnit.value;
+                let result;
+                
+                // 先转换为摄氏度
+                let celsius;
+                switch (inputUnitValue) {
+                    case 'c': // 摄氏度
+                        celsius = value;
+                        break;
+                    case 'f': // 华氏度
+                        celsius = (value - 32) * 5/9;
+                        break;
+                    case 'k': // 开尔文
+                        celsius = value - 273.15;
+                        break;
+                }
+                
+                // 从摄氏度转换为目标单位
+                switch (outputUnitValue) {
+                    case 'c': // 摄氏度
+                        result = celsius;
+                        break;
+                    case 'f': // 华氏度
+                        result = celsius * 9/5 + 32;
+                        break;
+                    case 'k': // 开尔文
+                        result = celsius + 273.15;
+                        break;
+                }
+                
+                outputValue.value = formatResult(result);
+            }
+            
+            // 格式化结果
+            function formatResult(value) {
+                // 如果是很大或很小的数，使用科学记数法
+                if (Math.abs(value) > 1e10 || (Math.abs(value) < 1e-6 && value !== 0)) {
+                    return value.toExponential(6);
+                }
+                
+                // 否则保留适当的小数位数
+                return parseFloat(value.toFixed(6)).toString();
+            }
+            
+            // 交换单位
+            function swapUnits() {
+                const temp = inputUnit.value;
+                inputUnit.value = outputUnit.value;
+                outputUnit.value = temp;
+                convert();
+            }
+            
+            // 事件绑定
+            unitCategory.addEventListener('change', initUnits);
+            inputValue.addEventListener('input', convert);
+            inputUnit.addEventListener('change', convert);
+            outputUnit.addEventListener('change', convert);
+            document.getElementById('convertBtn').addEventListener('click', convert);
+            document.getElementById('swapBtn').addEventListener('click', swapUnits);
+            
+            // 初始化
+            initUnits();
+        });
+    </script>
+</body>
+</html>

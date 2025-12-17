@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON格式化工具 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">JSON工具</li>
+                <li class="breadcrumb-item active" aria-current="page">JSON格式化</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">JSON格式化与压缩</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="inputJson" class="form-label">输入JSON</label>
+                                    <textarea class="form-control" id="inputJson" rows="10" placeholder="请输入JSON内容"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-primary me-2" id="formatBtn">
+                                        <i class="bi bi-file-earmark-text me-1"></i>
+                                        格式化
+                                    </button>
+                                    <button class="btn btn-secondary me-2" id="compressBtn">
+                                        <i class="bi bi-file-earmark-zip me-1"></i>
+                                        压缩
+                                    </button>
+                                    <button class="btn btn-success me-2" id="copyInputBtn">
+                                        <i class="bi bi-clipboard me-1"></i>
+                                        复制
+                                    </button>
+                                    <button class="btn btn-warning" id="clearInputBtn">
+                                        <i class="bi bi-trash me-1"></i>
+                                        清空
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="outputJson" class="form-label">输出结果</label>
+                                    <textarea class="form-control" id="outputJson" rows="10" placeholder="处理结果将显示在这里" readonly></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <button class="btn btn-success me-2" id="copyOutputBtn">
+                                        <i class="bi bi-clipboard me-1"></i>
+                                        复制
+                                    </button>
+                                    <button class="btn btn-info me-2" id="swapBtn">
+                                        <i class="bi bi-arrow-left-right me-1"></i>
+                                        交换
+                                    </button>
+                                    <button class="btn btn-warning" id="clearOutputBtn">
+                                        <i class="bi bi-trash me-1"></i>
+                                        清空
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">使用说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>功能介绍</h6>
+                        <ul>
+                            <li><strong>JSON格式化：</strong>将压缩的JSON字符串格式化为易读的形式，带有适当的缩进和换行</li>
+                            <li><strong>JSON压缩：</strong>将格式化的JSON字符串压缩为单行，去除所有不必要的空白字符</li>
+                        </ul>
+                        
+                        <h6>使用方法</h6>
+                        <ol>
+                            <li>在左侧输入框中粘贴或输入需要处理的JSON内容</li>
+                            <li>点击"格式化"按钮将JSON格式化为易读形式，或点击"压缩"按钮将JSON压缩为单行</li>
+                            <li>处理结果将显示在右侧输出框中</li>
+                            <li>可以使用"复制"按钮将内容复制到剪贴板</li>
+                            <li>使用"交换"按钮可以将输出结果交换到输入框，进行进一步处理</li>
+                        </ol>
+                        
+                        <h6>注意事项</h6>
+                        <ul>
+                            <li>确保输入的内容是有效的JSON格式，否则会出现错误提示</li>
+                            <li>处理大型JSON可能会消耗一定时间，请耐心等待</li>
+                            <li>所有处理均在浏览器本地完成，不会上传到任何服务器</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 格式化按钮事件
+            document.getElementById('formatBtn').addEventListener('click', formatJson);
+            
+            // 压缩按钮事件
+            document.getElementById('compressBtn').addEventListener('click', compressJson);
+            
+            // 复制输入按钮事件
+            document.getElementById('copyInputBtn').addEventListener('click', function() {
+                copyToClipboard('inputJson');
+            });
+            
+            // 复制输出按钮事件
+            document.getElementById('copyOutputBtn').addEventListener('click', function() {
+                copyToClipboard('outputJson');
+            });
+            
+            // 清空输入按钮事件
+            document.getElementById('clearInputBtn').addEventListener('click', function() {
+                document.getElementById('inputJson').value = '';
+                showToast('输入已清空', 'success');
+            });
+            
+            // 清空输出按钮事件
+            document.getElementById('clearOutputBtn').addEventListener('click', function() {
+                document.getElementById('outputJson').value = '';
+                showToast('输出已清空', 'success');
+            });
+            
+            // 交换按钮事件
+            document.getElementById('swapBtn').addEventListener('click', swapJson);
+        }
+        
+        // 格式化JSON
+        function formatJson() {
+            const input = document.getElementById('inputJson').value.trim();
+            if (!input) {
+                showToast('请输入JSON内容', 'warning');
+                return;
+            }
+            
+            try {
+                // 解析JSON
+                const jsonObj = JSON.parse(input);
+                
+                // 格式化为易读形式
+                const formattedJson = JSON.stringify(jsonObj, null, 2);
+                
+                // 显示结果
+                document.getElementById('outputJson').value = formattedJson;
+                
+                showToast('JSON格式化成功', 'success');
+            } catch (error) {
+                showToast('JSON格式错误: ' + error.message, 'error');
+            }
+        }
+        
+        // 压缩JSON
+        function compressJson() {
+            const input = document.getElementById('inputJson').value.trim();
+            if (!input) {
+                showToast('请输入JSON内容', 'warning');
+                return;
+            }
+            
+            try {
+                // 解析JSON
+                const jsonObj = JSON.parse(input);
+                
+                // 压缩为单行
+                const compressedJson = JSON.stringify(jsonObj);
+                
+                // 显示结果
+                document.getElementById('outputJson').value = compressedJson;
+                
+                showToast('JSON压缩成功', 'success');
+            } catch (error) {
+                showToast('JSON格式错误: ' + error.message, 'error');
+            }
+        }
+        
+        // 复制到剪贴板
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).value;
+            if (text) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast('已复制到剪贴板', 'success');
+                }, function() {
+                    showToast('复制失败', 'error');
+                });
+            } else {
+                showToast('没有可复制的内容', 'warning');
+            }
+        }
+        
+        // 交换输入和输出
+        function swapJson() {
+            const input = document.getElementById('inputJson').value;
+            const output = document.getElementById('outputJson').value;
+            
+            document.getElementById('inputJson').value = output;
+            document.getElementById('outputJson').value = input;
+            
+            showToast('内容已交换', 'success');
+        }
+    </script>
+</body>
+</html>

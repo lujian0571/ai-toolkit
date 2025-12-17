@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进制转换工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">数据转换</li>
+                <li class="breadcrumb-item active" aria-current="page">进制转换</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">进制转换工具</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="inputValue" class="form-label">输入值</label>
+                        <input type="text" class="form-control" id="inputValue" placeholder="请输入要转换的数值">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="inputBase" class="form-label">输入进制</label>
+                        <select class="form-select" id="inputBase">
+                            <option value="2">二进制 (Binary)</option>
+                            <option value="8">八进制 (Octal)</option>
+                            <option value="10" selected>十进制 (Decimal)</option>
+                            <option value="16">十六进制 (Hexadecimal)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="convertBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-arrow-repeat me-1"></i>
+                            执行转换
+                        </button>
+                    </div>
+                    <div>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">二进制 (Binary)</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text font-monospace" id="binaryResult">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">八进制 (Octal)</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text font-monospace" id="octalResult">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">十进制 (Decimal)</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text font-monospace" id="decimalResult">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0">十六进制 (Hexadecimal)</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text font-monospace" id="hexResult">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于进制转换</h5>
+            </div>
+            <div class="card-body">
+                <h6>数制系统简介</h6>
+                <p>
+                    数制是一种用统一的规则表示数字的方法。在日常生活和计算机科学中，我们经常使用不同的数制系统。
+                </p>
+                
+                <h6>常见的数制系统</h6>
+                <ul>
+                    <li><strong>二进制 (Binary)：</strong>基数为2，仅使用0和1两个数字，是计算机内部表示数据的基础</li>
+                    <li><strong>八进制 (Octal)：</strong>基数为8，使用0到7八个数字，在早期计算机系统中较为常见</li>
+                    <li><strong>十进制 (Decimal)：</strong>基数为10，使用0到9十个数字，是我们日常生活中最常用的数制</li>
+                    <li><strong>十六进制 (Hexadecimal)：</strong>基数为16，使用0到9和A到F十六个符号，常用于计算机科学中表示内存地址等</li>
+                </ul>
+                
+                <h6>进制转换原理</h6>
+                <p>
+                    进制转换的核心是基于不同基数的幂次运算。任何一个数都可以表示为各位数字与其位权的乘积之和。
+                    例如十进制数123可以表示为：1×10² + 2×10¹ + 3×10⁰ = 100 + 20 + 3 = 123
+                </p>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>计算机科学中的数据表示和处理</li>
+                    <li>编程中的位运算和内存地址表示</li>
+                    <li>数字电路设计和分析</li>
+                    <li>数学学习和研究</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>在输入框中输入要转换的数值</li>
+                    <li>选择输入数值的进制类型</li>
+                    <li>点击"执行转换"按钮</li>
+                    <li>在下方查看转换到各种进制的结果</li>
+                    <li>使用"清空"按钮清除当前输入和结果</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>输入数值必须符合所选进制的规则（如二进制只能包含0和1）</li>
+                    <li>工具支持常见的进制转换，对于特殊需求可能需要专业工具</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputValue = document.getElementById('inputValue');
+            const inputBase = document.getElementById('inputBase');
+            const binaryResult = document.getElementById('binaryResult');
+            const octalResult = document.getElementById('octalResult');
+            const decimalResult = document.getElementById('decimalResult');
+            const hexResult = document.getElementById('hexResult');
+            
+            // 执行转换
+            document.getElementById('convertBtn').addEventListener('click', function() {
+                try {
+                    const value = inputValue.value.trim();
+                    const base = parseInt(inputBase.value);
+                    
+                    if (!value) {
+                        showToast('请输入要转换的数值', 'error');
+                        return;
+                    }
+                    
+                    // 验证输入是否符合进制规则
+                    if (!isValidNumber(value, base)) {
+                        showToast(`输入的数值不符合${getBaseName(base)}的规则`, 'error');
+                        return;
+                    }
+                    
+                    // 转换为十进制
+                    let decimalValue;
+                    try {
+                        decimalValue = parseInt(value, base);
+                        if (isNaN(decimalValue)) {
+                            throw new Error('无效的数值');
+                        }
+                    } catch (e) {
+                        showToast('数值转换失败: ' + e.message, 'error');
+                        return;
+                    }
+                    
+                    // 转换为各进制
+                    binaryResult.textContent = decimalValue.toString(2);
+                    octalResult.textContent = decimalValue.toString(8);
+                    decimalResult.textContent = decimalValue.toString(10);
+                    hexResult.textContent = decimalValue.toString(16).toUpperCase();
+                } catch (e) {
+                    showToast('转换出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputValue.value = '';
+                binaryResult.textContent = '-';
+                octalResult.textContent = '-';
+                decimalResult.textContent = '-';
+                hexResult.textContent = '-';
+            });
+            
+            // 验证数值是否符合进制规则
+            function isValidNumber(value, base) {
+                switch(base) {
+                    case 2:  // 二进制
+                        return /^[01]+$/.test(value);
+                    case 8:  // 八进制
+                        return /^[0-7]+$/.test(value);
+                    case 10: // 十进制
+                        return /^\d+$/.test(value);
+                    case 16: // 十六进制
+                        return /^[0-9A-Fa-f]+$/.test(value);
+                    default:
+                        return false;
+                }
+            }
+            
+            // 获取进制名称
+            function getBaseName(base) {
+                switch(base) {
+                    case 2: return '二进制';
+                    case 8: return '八进制';
+                    case 10: return '十进制';
+                    case 16: return '十六进制';
+                    default: return '未知进制';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

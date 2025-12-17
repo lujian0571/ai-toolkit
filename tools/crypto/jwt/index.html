@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT 解析与生成器 - 工具集</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .token-segment {
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .header-segment {
+            background-color: #e9f7ef;
+            border: 1px solid #28a745;
+        }
+        .payload-segment {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+        .signature-segment {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+        }
+        .jwt-output {
+            word-break: break-all;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">JWT解析与生成</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="jwtTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="generate-tab" data-bs-toggle="tab" data-bs-target="#generate" type="button" role="tab">生成 JWT</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="parse-tab" data-bs-toggle="tab" data-bs-target="#parse" type="button" role="tab">解析 JWT</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="jwtTabContent">
+                    <!-- 生成 JWT Tab -->
+                    <div class="tab-pane fade show active" id="generate" role="tabpanel">
+                        <form id="jwtGenerateForm">
+                            <div class="mb-3">
+                                <label for="algorithm" class="form-label">算法</label>
+                                <select class="form-select" id="algorithm">
+                                    <option value="HS256" selected>HS256 (HMAC SHA-256)</option>
+                                    <option value="HS384">HS384 (HMAC SHA-384)</option>
+                                    <option value="HS512">HS512 (HMAC SHA-512)</option>
+                                    <option value="RS256">RS256 (RSA SHA-256)</option>
+                                    <option value="RS384">RS384 (RSA SHA-384)</option>
+                                    <option value="RS512">RS512 (RSA SHA-512)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="secretKey" class="form-label">密钥</label>
+                                <input type="text" class="form-control" id="secretKey" placeholder="输入密钥" value="secret">
+                                <div class="form-text">对于 HMAC 算法，请输入密钥。对于 RSA 算法，请输入私钥（生成）或公钥（验证）。</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="headerJson" class="form-label">Header (头部)</label>
+                                <textarea class="form-control font-monospace" id="headerJson" rows="4">{
+  "alg": "HS256",
+  "typ": "JWT"
+}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="payloadJson" class="form-label">Payload (载荷)</label>
+                                <textarea class="form-control font-monospace" id="payloadJson" rows="6">{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022,
+  "exp": 1516242622
+}</textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                生成 JWT
+                            </button>
+                        </form>
+                        
+                        <div id="generatedJwtResult" class="mt-4" style="display: none;">
+                            <h5>生成的 JWT:</h5>
+                            <div class="alert alert-success">
+                                <div id="generatedJwt" class="jwt-output"></div>
+                            </div>
+                            
+                            <h5 class="mt-3">分段解析:</h5>
+                            <div>
+                                <div class="token-segment header-segment">
+                                    <strong>Header (头部)</strong>
+                                    <pre id="generatedHeader" class="mb-0 mt-2"></pre>
+                                </div>
+                                <div class="token-segment payload-segment">
+                                    <strong>Payload (载荷)</strong>
+                                    <pre id="generatedPayload" class="mb-0 mt-2"></pre>
+                                </div>
+                                <div class="token-segment signature-segment">
+                                    <strong>Signature (签名)</strong>
+                                    <pre id="generatedSignature" class="mb-0 mt-2"></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 解析 JWT Tab -->
+                    <div class="tab-pane fade" id="parse" role="tabpanel">
+                        <form id="jwtParseForm">
+                            <div class="mb-3">
+                                <label for="jwtToken" class="form-label">JWT Token</label>
+                                <textarea class="form-control font-monospace" id="jwtToken" rows="4" placeholder="请输入 JWT Token"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="parseSecretKey" class="form-label">密钥 (用于验证签名)</label>
+                                <input type="text" class="form-control" id="parseSecretKey" placeholder="输入密钥" value="secret">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-1"></i>
+                                解析 JWT
+                            </button>
+                        </form>
+                        
+                        <div id="parsedJwtResult" class="mt-4" style="display: none;">
+                            <h5>解析结果:</h5>
+                            
+                            <div class="alert alert-info">
+                                <strong>算法:</strong> <span id="parsedAlgorithm"></span>
+                            </div>
+                            
+                            <div class="token-segment header-segment">
+                                <strong>Header (头部)</strong>
+                                <pre id="parsedHeader" class="mb-0 mt-2"></pre>
+                            </div>
+                            <div class="token-segment payload-segment">
+                                <strong>Payload (载荷)</strong>
+                                <pre id="parsedPayload" class="mb-0 mt-2"></pre>
+                            </div>
+                            <div class="token-segment signature-segment">
+                                <strong>Signature (签名)</strong>
+                                <pre id="parsedSignature" class="mb-0 mt-2"></pre>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h5>验证结果:</h5>
+                                <div id="verificationResult"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部内容 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">JWT 简介</h5>
+            </div>
+            <div class="card-body">
+                <p>JWT (JSON Web Token) 是一种开放标准 (RFC 7519)，用于在各方之间安全地传输信息。它是一个紧凑的、URL 安全的令牌，特别适用于分布式站点的单点登录 (SSO) 场景。</p>
+                
+                <h6>JWT 结构</h6>
+                <p>JWT 由三部分组成，用点 (.) 分隔：</p>
+                <ol>
+                    <li><strong>Header（头部）</strong>：包含令牌类型和签名算法</li>
+                    <li><strong>Payload（载荷）</strong>：包含声明（claims），即实际要传输的数据</li>
+                    <li><strong>Signature（签名）</strong>：用于验证令牌的真实性</li>
+                </ol>
+                
+                <h6>常见用途</h6>
+                <ul>
+                    <li>身份认证：用户登录后获得 JWT，后续请求携带此令牌进行身份验证</li>
+                    <li>信息交换：安全地在各方之间传输信息</li>
+                </ul>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>JWT 中的信息是 Base64 编码的，可以被轻易解码，因此不应存放敏感信息</li>
+                    <li>签名的作用是验证令牌未被篡改，而不是加密内容</li>
+                    <li>应该设置合理的过期时间以提高安全性</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/jwt-js-decode@1.9.0/dist/jwt-js-decode.pkg.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 监听生成表单提交
+            document.getElementById('jwtGenerateForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateJwt();
+            });
+            
+            // 监听解析表单提交
+            document.getElementById('jwtParseForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                parseJwt();
+            });
+            
+            // 当算法选择改变时，更新 Header 中的 alg 字段
+            document.getElementById('algorithm').addEventListener('change', function() {
+                const alg = this.value;
+                const headerJson = JSON.parse(document.getElementById('headerJson').value);
+                headerJson.alg = alg;
+                document.getElementById('headerJson').value = JSON.stringify(headerJson, null, 2);
+            });
+        });
+        
+        // Base64Url 解码函数
+        function base64UrlDecode(str) {
+            // 添加必要的 '=' 字符以使长度为4的倍数
+            const padding = '='.repeat((4 - str.length % 4) % 4);
+            const base64 = (str + padding)
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            
+            const rawData = atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            
+            return outputArray;
+        }
+        
+        // Base64Url 编码函数
+        function base64UrlEncode(arrayBuffer) {
+            let base64 = '';
+            const bytes = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                base64 += String.fromCharCode(bytes[i]);
+            }
+            return btoa(base64)
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_')
+                .replace(/=/g, '');
+        }
+        
+        // UTF-8 编码函数
+        function utf8Encode(str) {
+            return new TextEncoder().encode(str);
+        }
+        
+        // UTF-8 解码函数
+        function utf8Decode(uint8Array) {
+            return new TextDecoder().decode(uint8Array);
+        }
+        
+        // 生成 JWT
+        async function generateJwt() {
+            try {
+                const algorithm = document.getElementById('algorithm').value;
+                const secretKey = document.getElementById('secretKey').value;
+                const headerJson = document.getElementById('headerJson').value;
+                const payloadJson = document.getElementById('payloadJson').value;
+                
+                // 解析 JSON
+                const header = JSON.parse(headerJson);
+                const payload = JSON.parse(payloadJson);
+                
+                // 设置 alg 字段
+                header.alg = algorithm;
+                
+                // 编码 Header 和 Payload
+                const headerString = JSON.stringify(header);
+                const payloadString = JSON.stringify(payload);
+                
+                const encodedHeader = base64UrlEncode(utf8Encode(headerString));
+                const encodedPayload = base64UrlEncode(utf8Encode(payloadString));
+                
+                // 创建签名内容
+                const signingInput = encodedHeader + '.' + encodedPayload;
+                
+                // 根据算法生成签名
+                let signature;
+                if (algorithm.startsWith('HS')) {
+                    // HMAC 系列算法
+                    const key = utf8Encode(secretKey);
+                    const data = utf8Encode(signingInput);
+                    
+                    // 获取对应的哈希算法
+                    let hashAlg;
+                    switch (algorithm) {
+                        case 'HS256':
+                            hashAlg = 'SHA-256';
+                            break;
+                        case 'HS384':
+                            hashAlg = 'SHA-384';
+                            break;
+                        case 'HS512':
+                            hashAlg = 'SHA-512';
+                            break;
+                        default:
+                            throw new Error('不支持的算法: ' + algorithm);
+                    }
+                    
+                    // 导入密钥
+                    const cryptoKey = await crypto.subtle.importKey(
+                        'raw',
+                        key,
+                        { name: 'HMAC', hash: { name: hashAlg } },
+                        false,
+                        ['sign']
+                    );
+                    
+                    // 生成签名
+                    const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, data);
+                    signature = base64UrlEncode(signatureBuffer);
+                } else if (algorithm.startsWith('RS')) {
+                    // RSA 系列算法
+                    showToast('RSA 算法需要私钥进行签名，出于安全考虑，本工具暂不支持在浏览器中进行 RSA 签名。', 'warning');
+                    return;
+                } else {
+                    throw new Error('暂不支持该算法: ' + algorithm);
+                }
+                
+                // 组合 JWT
+                const jwt = signingInput + '.' + signature;
+                
+                // 显示结果
+                document.getElementById('generatedJwt').textContent = jwt;
+                document.getElementById('generatedHeader').textContent = JSON.stringify(header, null, 2);
+                document.getElementById('generatedPayload').textContent = JSON.stringify(payload, null, 2);
+                document.getElementById('generatedSignature').textContent = signature;
+                
+                document.getElementById('generatedJwtResult').style.display = 'block';
+                
+                // 滚动到结果区域
+                document.getElementById('generatedJwtResult').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                showToast('生成 JWT 时出错: ' + error.message, 'error');
+            }
+        }
+        
+        // 解析 JWT
+        async function parseJwt() {
+            try {
+                const jwtToken = document.getElementById('jwtToken').value.trim();
+                const secretKey = document.getElementById('parseSecretKey').value;
+                
+                if (!jwtToken) {
+                    showToast('请输入 JWT Token', 'warning');
+                    return;
+                }
+                
+                // 使用 jwt-js-decode 库解析 JWT
+                const jwtObj = jwtJsDecode.decode(jwtToken);
+                
+                // 显示解析结果
+                document.getElementById('parsedAlgorithm').textContent = jwtObj.header.alg;
+                document.getElementById('parsedHeader').textContent = JSON.stringify(jwtObj.header, null, 2);
+                document.getElementById('parsedPayload').textContent = JSON.stringify(jwtObj.payload, null, 2);
+                document.getElementById('parsedSignature').textContent = jwtObj.signature;
+                
+                // 验证签名
+                try {
+                    // 对于 RSA 算法，jwt-js-decode 需要公钥进行验证
+                    if (jwtObj.header.alg.startsWith('RS')) {
+                        showToast('RSA 算法验证需要公钥，出于安全考虑，本工具暂不支持在浏览器中进行 RSA 签名验证。', 'warning');
+                    } else {
+                        const isValid = await jwtJsDecode.verify(jwtToken, secretKey);
+                        const verificationElement = document.getElementById('verificationResult');
+                        if (isValid) {
+                            verificationElement.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle-fill me-1"></i> 签名验证成功！</div>';
+                        } else {
+                            verificationElement.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle-fill me-1"></i> 签名验证失败！</div>';
+                        }
+                    }
+                } catch (verifyError) {
+                    document.getElementById('verificationResult').innerHTML = 
+                        '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i> 无法验证签名: ' + verifyError.message + '</div>';
+                }
+                
+                document.getElementById('parsedJwtResult').style.display = 'block';
+                
+                // 滚动到结果区域
+                document.getElementById('parsedJwtResult').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                showToast('解析 JWT 时出错: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

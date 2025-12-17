@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二维码生成器 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">二维码</li>
+                <li class="breadcrumb-item active" aria-current="page">二维码生成</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">二维码生成设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="qrContent" class="form-label">内容</label>
+<textarea class="form-control" id="qrContent" rows="3" placeholder="请输入要生成二维码的内容"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="qrSize" class="form-label">尺寸 (像素)</label>
+                            <input type="range" class="form-range" min="100" max="500" step="10" value="200" id="qrSize">
+                            <div class="text-end">
+                                <span id="sizeValue">200</span> px
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="qrColor" class="form-label">前景色</label>
+                            <input type="color" class="form-control form-control-color" id="qrColor" value="#000000">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="qrBgColor" class="form-label">背景色</label>
+                            <input type="color" class="form-control form-control-color" id="qrBgColor" value="#ffffff">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="logoImage" class="form-label">Logo图片</label>
+                            <input class="form-control" type="file" id="logoImage" accept="image/*">
+                            <div class="form-text">支持JPG、PNG格式，建议尺寸小于二维码的1/5</div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">二维码预览</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div id="qrPreview" class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                            <div class="text-muted">请先输入二维码内容</div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-outline-secondary" id="downloadBtn" disabled>
+                                <i class="bi bi-download me-1"></i>
+                                下载二维码
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 初始化变量
+        let currentQRCode = null;
+        let logoImage = null;
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+            
+            // 生成初始二维码
+            generateQRCode();
+        });
+        
+        // 绑定事件
+        function bindEvents() {
+            // 尺寸滑块事件
+            document.getElementById('qrSize').addEventListener('input', function() {
+                document.getElementById('sizeValue').textContent = this.value;
+                generateQRCode();
+            });
+            
+            // 内容变化事件
+            document.getElementById('qrContent').addEventListener('input', generateQRCode);
+            
+            // 颜色变化事件
+            document.getElementById('qrColor').addEventListener('input', generateQRCode);
+            document.getElementById('qrBgColor').addEventListener('input', generateQRCode);
+            
+            // Logo图片上传事件
+            document.getElementById('logoImage').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        logoImage = e.target.result;
+                        generateQRCode();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    logoImage = null;
+                    generateQRCode();
+                }
+            });
+            
+            // 生成按钮事件（保留以防需要手动触发）
+            document.getElementById('generateBtn').addEventListener('click', generateQRCode);
+            
+            // 下载按钮事件
+            document.getElementById('downloadBtn').addEventListener('click', downloadQRCode);
+        }
+        
+        // 生成二维码
+        function generateQRCode() {
+            const content = document.getElementById('qrContent').value.trim();
+            const size = parseInt(document.getElementById('qrSize').value);
+            const color = document.getElementById('qrColor').value;
+            const bgColor = document.getElementById('qrBgColor').value;
+            
+            if (!content) {
+                showToast('请输入二维码内容', 'warning');
+                return;
+            }
+            
+            try {
+                // 清空预览区域
+                const preview = document.getElementById('qrPreview');
+                preview.innerHTML = '';
+                
+                // 创建canvas元素
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                preview.appendChild(canvas);
+                
+                // 生成二维码
+                QRCode.toCanvas(canvas, content, {
+                    width: size,
+                    height: size,
+                    margin: 2,
+                    color: {
+                        dark: color,
+                        light: bgColor
+                    },
+                    errorCorrectionLevel: 'H' // 使用高容错级别以支持Logo遮挡
+                }, function (error) {
+                    if (error) {
+                        showToast('生成二维码失败: ' + error.message, 'error');
+                        return;
+                    }
+                    
+                    // 如果有Logo，则添加到二维码中心
+                    if (logoImage) {
+                        addLogoToQRCode(canvas, logoImage, function() {
+                            // Logo绘制完成后保存二维码
+                            currentQRCode = canvas.toDataURL('image/png');
+                            
+                            // 启用下载按钮
+                            document.getElementById('downloadBtn').disabled = false;
+                        });
+                    } else {
+                        // 没有Logo直接保存二维码
+                        currentQRCode = canvas.toDataURL('image/png');
+                        
+                        // 启用下载按钮
+                        document.getElementById('downloadBtn').disabled = false;
+                    }
+                });
+            } catch (error) {
+                showToast('生成二维码失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 下载二维码
+        function downloadQRCode() {
+            if (!currentQRCode) {
+                showToast('没有可下载的二维码', 'warning');
+                return;
+            }
+            
+            try {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = currentQRCode;
+                link.click();
+                
+                showToast('二维码下载成功', 'success');
+            } catch (error) {
+                showToast('下载二维码失败: ' + error.message, 'error');
+            }
+        }
+        
+        // 在二维码中心添加Logo
+        function addLogoToQRCode(canvas, logoSrc, callback) {
+            const ctx = canvas.getContext('2d');
+            const logo = new Image();
+            logo.src = logoSrc;
+            
+            logo.onload = function() {
+                // Logo大小设置为二维码的1/5
+                const logoSize = canvas.width / 5;
+                // Logo位置（居中）
+                const x = (canvas.width - logoSize) / 2;
+                const y = (canvas.height - logoSize) / 2;
+                
+                // 绘制Logo到二维码中心
+                ctx.drawImage(logo, x, y, logoSize, logoSize);
+                
+                // Logo绘制完成后执行回调
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            };
+            
+            // 如果Logo加载失败，也执行回调
+            logo.onerror = function() {
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
+            };
+        }
+    </script>
+</body>
+</html>

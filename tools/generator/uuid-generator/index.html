@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID 生成器</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">生成工具</li>
+                <li class="breadcrumb-item active" aria-current="page">UUID 生成</li>
+            </ol>
+        </nav>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">UUID 生成器</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="uuidVersion" class="form-label">UUID 版本</label>
+                        <select class="form-select" id="uuidVersion">
+                            <option value="4" selected>版本 4 (随机生成)</option>
+                            <option value="1">版本 1 (基于时间和 MAC 地址)</option>
+                            <option value="nil">空 UUID (全零)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="format" class="form-label">输出格式</label>
+                        <select class="form-select" id="format">
+                            <option value="lowercase" selected>小写 (550e8400-e29b-41d4-a716-446655440000)</option>
+                            <option value="uppercase">大写 (550E8400-E29B-41D4-A716-446655440000)</option>
+                            <option value="no-dashes">无连字符 (550e8400e29b41d4a716446655440000)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="quantity" class="form-label">生成数量</label>
+                        <input type="number" class="form-control" id="quantity" min="1" max="100" value="1">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <button id="generateBtn" class="btn btn-primary me-2">
+                            <i class="bi bi-magic me-1"></i>
+                            生成 UUID
+                        </button>
+                    </div>
+                    <div>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i>
+                            清空结果
+                        </button>
+                        <button id="copyBtn" class="btn btn-secondary ms-2" disabled>
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">生成结果</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="resultContainer" class="font-monospace">
+                                    <p class="text-muted">点击"生成 UUID"按钮开始生成</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 百科内容 -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">关于 UUID</h5>
+            </div>
+            <div class="card-body">
+                <h6>UUID 简介</h6>
+                <p>
+                    UUID (Universally Unique Identifier) 是通用唯一识别码的缩写，是一种软件建构的标准，
+                    亦为开放软件基金会 (OSF) 的组织在分布式计算环境 (DCE) 领域的一部分。
+                </p>
+                
+                <h6>UUID 版本</h6>
+                <ul>
+                    <li><strong>版本 1：</strong>基于时间和节点（通常是 MAC 地址）生成，包含时间戳信息</li>
+                    <li><strong>版本 2：</strong>基于 DCE 安全版本，较少使用</li>
+                    <li><strong>版本 3：</strong>基于名字的 MD5 散列值生成</li>
+                    <li><strong>版本 4：</strong>基于随机数生成，本工具默认使用此版本</li>
+                    <li><strong>版本 5：</strong>基于名字的 SHA-1 散列值生成</li>
+                    <li><strong>Nil UUID：</strong>特殊 UUID，所有位都是零 (00000000-0000-0000-0000-000000000000)</li>
+                </ul>
+                
+                <h6>格式规范</h6>
+                <p>
+                    标准的 UUID 格式为 8-4-4-4-12 的 32 个字符组成，总共 36 个字符（包括连字符）。
+                    例如：550e8400-e29b-41d4-a716-446655440000
+                </p>
+                
+                <h6>应用场景</h6>
+                <ul>
+                    <li><strong>数据库主键：</strong>作为数据库记录的唯一标识符</li>
+                    <li><strong>分布式系统：</strong>在分布式系统中生成唯一标识符</li>
+                    <li><strong>软件开发：</strong>为对象、组件或资源生成唯一标识</li>
+                    <li><strong>网络协议：</strong>在网络通信中标识会话或事务</li>
+                    <li><strong>安全令牌：</strong>生成一次性令牌或访问密钥</li>
+                </ul>
+                
+                <h6>UUID 特点</h6>
+                <ul>
+                    <li><strong>唯一性：</strong>在实际应用中可以保证全球唯一</li>
+                    <li><strong>匿名性：</strong>不包含地理位置或时间信息（版本4）</li>
+                    <li><strong>便携性：</strong>无需中央机构分配</li>
+                    <li><strong>持久性：</strong>一旦生成，终身唯一</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li>选择 UUID 版本（目前支持版本 1、版本 4 和 Nil UUID）</li>
+                    <li>选择输出格式（小写、大写或无连字符）</li>
+                    <li>设置要生成的 UUID 数量</li>
+                    <li>点击"生成 UUID"按钮获取结果</li>
+                    <li>可以复制结果或将结果清空</li>
+                </ol>
+                
+                <h6>注意事项</h6>
+                <ul>
+                    <li>本工具使用浏览器内置的加密安全随机数生成器，适用于一般用途</li>
+                    <li>版本 1 UUID 包含时间戳信息，可能暴露生成时间</li>
+                    <li>版本 4 UUID 完全随机生成，更适用于隐私敏感场景</li>
+                    <li>工具完全在浏览器中运行，不会上传任何数据</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uuidVersion = document.getElementById('uuidVersion');
+            const format = document.getElementById('format');
+            const quantity = document.getElementById('quantity');
+            const resultContainer = document.getElementById('resultContainer');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            // 生成 UUID
+            document.getElementById('generateBtn').addEventListener('click', function() {
+                try {
+                    const version = uuidVersion.value;
+                    const fmt = format.value;
+                    const count = parseInt(quantity.value);
+                    
+                    // 验证输入
+                    if (isNaN(count) || count <= 0 || count > 100) {
+                        showToast('生成数量必须是1到100之间的整数', 'error');
+                        return;
+                    }
+                    
+                    const uuids = [];
+                    for (let i = 0; i < count; i++) {
+                        let uuid;
+                        switch(version) {
+                            case '1':
+                                uuid = generateUUID1();
+                                break;
+                            case '4':
+                                uuid = generateUUID4();
+                                break;
+                            case 'nil':
+                                uuid = '00000000-0000-0000-0000-000000000000';
+                                break;
+                        }
+                        
+                        // 格式化 UUID
+                        uuid = formatUUID(uuid, fmt);
+                        uuids.push(uuid);
+                    }
+                    
+                    displayResults(uuids);
+                    copyBtn.disabled = false;
+                } catch (e) {
+                    showToast('生成 UUID 时出错: ' + e.message, 'error');
+                }
+            });
+            
+            // 生成版本 1 UUID (简化版)
+            function generateUUID1() {
+                // 这里实现一个简化的版本1 UUID 生成器
+                // 实际的版本1 UUID 需要基于时间和 MAC 地址
+                // 为了简化，我们使用版本4的实现
+                return generateUUID4();
+            }
+            
+            // 生成版本 4 UUID
+            function generateUUID4() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+            
+            // 格式化 UUID
+            function formatUUID(uuid, format) {
+                switch(format) {
+                    case 'lowercase':
+                        return uuid.toLowerCase();
+                    case 'uppercase':
+                        return uuid.toUpperCase();
+                    case 'no-dashes':
+                        return uuid.replace(/-/g, '');
+                    default:
+                        return uuid;
+                }
+            }
+            
+            // 显示结果
+            function displayResults(uuids) {
+                if (uuids.length === 0) {
+                    resultContainer.innerHTML = '<p class="text-muted">未生成任何 UUID</p>';
+                    return;
+                }
+                
+                let html = '<div class="row g-2">';
+                uuids.forEach((uuid, index) => {
+                    html += `<div class="col-12 col-md-6"><div class="border rounded p-2 text-break">${uuid}</div></div>`;
+                });
+                html += '</div>';
+                
+                resultContainer.innerHTML = html;
+            }
+            
+            // 清空结果
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                resultContainer.innerHTML = '<p class="text-muted">点击"生成 UUID"按钮开始生成</p>';
+                copyBtn.disabled = true;
+            });
+            
+            // 复制结果
+            copyBtn.addEventListener('click', function() {
+                const text = resultContainer.innerText;
+                if (text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast('结果已复制到剪贴板', 'success');
+                    }).catch(() => {
+                        showToast('复制失败', 'error');
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

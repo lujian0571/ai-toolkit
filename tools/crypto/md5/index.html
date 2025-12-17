@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD5 加密工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">MD5 加密工具</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">MD5 加密工具</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">输入文本</label>
+                            <textarea class="form-control" id="inputText" rows="6" placeholder="请输入要进行MD5加密的文本"></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <button id="encryptBtn" class="btn btn-primary me-2">
+                                    <i class="bi bi-lock me-1"></i>
+                                    MD5 加密
+                                </button>
+                            </div>
+                            <div>
+                                <button id="clearBtn" class="btn btn-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="outputText" class="form-label">输出结果</label>
+                            <textarea class="form-control" id="outputText" rows="6" readonly></textarea>
+                        </div>
+                        
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">关于 MD5</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5>什么是 MD5</h5>
+                        <p class="card-text">
+                            MD5（Message-Digest Algorithm 5）是一种广泛使用的密码散列函数，可以产生出一个128位（16字节）的散列值（hash value），用于确保信息传输完整一致。MD5算法较容易受到碰撞攻击，因此不适用于数字签名等安全性要求较高的场景。
+                        </p>
+                        
+                        <h5>MD5 的特点</h5>
+                        <ul>
+                            <li>压缩性：任意长度的数据，算出的MD5值都是固定的128位</li>
+                            <li>易计算：从原数据计算出MD5值很容易</li>
+                            <li>抗修改性：对原数据进行任何改动，哪怕只修改一个字节，所得到的MD5值都有很大区别</li>
+                            <li>弱抗碰撞性：已知原数据，想找到一个具有相同MD5值的数据（即伪造数据）非常困难</li>
+                        </ul>
+                        
+                        <h5>如何使用本工具</h5>
+                        <ol>
+                            <li><strong>加密：</strong>在输入框中粘贴或输入需要加密的文本，点击"MD5 加密"按钮，即可在输出框中看到加密后的结果。</li>
+                            <li><strong>清空：</strong>点击"清空"按钮可以同时清空输入框和输出框的内容。</li>
+                            <li><strong>复制结果：</strong>点击"复制结果"按钮可以将输出框中的内容复制到剪贴板。</li>
+                        </ol>
+                        
+                        <h5>注意事项</h5>
+                        <ul>
+                            <li>MD5 不是加密算法，而是摘要算法</li>
+                            <li>MD5 是不可逆的，无法通过MD5值反推出原文</li>
+                            <li>MD5 存在碰撞风险，不适合用作密码存储等高安全性场景</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script src="https://unpkg.com/blueimp-md5@2.19.0/js/md5.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            
+            // 加密功能
+            document.getElementById('encryptBtn').addEventListener('click', function() {
+                try {
+                    const encrypted = md5(inputText.value);
+                    outputText.value = encrypted;
+                } catch (e) {
+                    showToast('加密出错: ' + e.message, 'error');
+                }
+            });
+
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+            });
+
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

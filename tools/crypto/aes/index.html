@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES 加解密工具</title>
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div id="navbar-container"></div>
+    
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">加密解密</li>
+                <li class="breadcrumb-item active" aria-current="page">AES 加解密工具</li>
+            </ol>
+        </nav>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">AES 加密/解密工具</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="inputText" class="form-label">输入文本</label>
+                            <textarea class="form-control" id="inputText" rows="4" placeholder="请输入要处理的文本"></textarea>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="keyInput" class="form-label">密钥 (Key)</label>
+                                <input type="text" class="form-control" id="keyInput" placeholder="请输入16位、24位或32位密钥">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ivInput" class="form-label">初始化向量 (IV)</label>
+                                <input type="text" class="form-control" id="ivInput" placeholder="ECB模式下可为空">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="modeSelect" class="form-label">加密模式</label>
+                                <select class="form-select" id="modeSelect">
+                                    <option value="CBC" selected>CBC</option>
+                                    <option value="CFB">CFB</option>
+                                    <option value="CTR">CTR</option>
+                                    <option value="OFB">OFB</option>
+                                    <option value="ECB">ECB</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="paddingSelect" class="form-label">填充方式</label>
+                                <select class="form-select" id="paddingSelect">
+                                    <option value="Pkcs7" selected>PKCS7</option>
+                                    <option value="Iso97971">ISO97971</option>
+                                    <option value="AnsiX923">ANSIX923</option>
+                                    <option value="Iso10126">ISO10126</option>
+                                    <option value="ZeroPadding">ZeroPadding</option>
+                                    <option value="NoPadding">NoPadding</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <button id="encryptBtn" class="btn btn-primary me-2">
+                                    <i class="bi bi-lock me-1"></i>
+                                    AES 加密
+                                </button>
+                                <button id="decryptBtn" class="btn btn-success me-2">
+                                    <i class="bi bi-unlock me-1"></i>
+                                    AES 解密
+                                </button>
+                            </div>
+                            <div>
+                                <button id="swapBtn" class="btn btn-info me-2">
+                                    <i class="bi bi-arrow-left-right me-1"></i>
+                                    交换内容
+                                </button>
+                                <button id="clearBtn" class="btn btn-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    清空
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="outputText" class="form-label">输出结果</label>
+                            <textarea class="form-control" id="outputText" rows="4" readonly></textarea>
+                        </div>
+                        
+                        <button id="copyBtn" class="btn btn-outline-secondary">
+                            <i class="bi bi-clipboard me-1"></i>
+                            复制结果
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">关于 AES</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5>什么是 AES</h5>
+                        <p class="card-text">
+                            AES（Advanced Encryption Standard，高级加密标准）是美国联邦政府采用的一种对称加密算法，
+                            也是目前最广泛使用的加密算法之一。AES 支持 128、192 和 256 位密钥长度。
+                        </p>
+                        
+                        <h5>AES 加密模式</h5>
+                        <ul>
+                            <li><strong>ECB（电子密码本模式）：</strong>简单的块加密，相同明文块产生相同密文块，安全性较低</li>
+                            <li><strong>CBC（密码分组链接模式）：</strong>每个明文块在加密前与前一个密文块进行异或运算，需要初始化向量(IV)</li>
+                            <li><strong>CFB（密码反馈模式）：</strong>将块密码用作自同步流密码，适用于实时传输</li>
+                            <li><strong>OFB（输出反馈模式）：</strong>将块密码用作同步流密码，加密和解密过程相同</li>
+                            <li><strong>CTR（计数器模式）：</strong>将块密码用作流密码，支持并行处理，效率高</li>
+                        </ul>
+                        
+                        <h5>填充方式说明</h5>
+                        <ul>
+                            <li><strong>PKCS7：</strong>每个填充字节的值等于需要填充的字节数</li>
+                            <li><strong>ISO97971：</strong>ISO/IEC 9797-1 填充方式</li>
+                            <li><strong>ANSIX923：</strong>ANSI X9.23 填充方式</li>
+                            <li><strong>ISO10126：</strong>ISO 10126 填充方式</li>
+                            <li><strong>ZeroPadding：</strong>用零进行填充</li>
+                            <li><strong>NoPadding：</strong>不进行填充，要求明文长度必须是块大小的整数倍</li>
+                        </ul>
+                        
+                        <h5>如何使用本工具</h5>
+                        <ol>
+                            <li><strong>加密：</strong>输入明文、密钥和选择加密模式及填充方式，点击"AES 加密"按钮</li>
+                            <li><strong>解密：</strong>输入密文、密钥和选择对应的加密模式及填充方式，点击"AES 解密"按钮</li>
+                            <li><strong>密钥要求：</strong>密钥长度应为16位(128bit)、24位(192bit)或32位(256bit)</li>
+                            <li><strong>IV要求：</strong>除ECB模式外，其他模式均需要提供16位的初始化向量</li>
+                            <li><strong>交换内容：</strong>点击"交换内容"按钮可以将输入框和输出框的内容互换，方便连续操作</li>
+                            <li><strong>清空：</strong>点击"清空"按钮可以同时清空所有输入框和输出框的内容</li>
+                            <li><strong>复制结果：</strong>点击"复制结果"按钮可以将输出框中的内容复制到剪贴板</li>
+                        </ol>
+                        
+                        <h5>注意事项</h5>
+                        <ul>
+                            <li>ECB模式是最不安全的模式，在实际应用中应避免使用</li>
+                            <li>对于 CBC、CFB、OFB 和 CTR 模式，必须提供初始化向量(IV)</li>
+                            <li>密钥和 IV 应妥善保管，泄露会导致加密失效</li>
+                            <li>不同的加密模式和填充方式会产生不同的结果，请确保加密和解密时设置一致</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/crypto-js@4.2.0/crypto-js.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const keyInput = document.getElementById('keyInput');
+            const ivInput = document.getElementById('ivInput');
+            const modeSelect = document.getElementById('modeSelect');
+            const paddingSelect = document.getElementById('paddingSelect');
+            
+            // 加密功能
+            document.getElementById('encryptBtn').addEventListener('click', function() {
+                try {
+                    const plaintext = inputText.value;
+                    const key = keyInput.value;
+                    const iv = ivInput.value;
+                    const mode = modeSelect.value;
+                    const padding = paddingSelect.value;
+                    
+                    if (!plaintext) {
+                        showToast('请输入要加密的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!key) {
+                        showToast('请输入密钥', 'error');
+                        return;
+                    }
+                    
+                    // 检查密钥长度
+                    if (key.length !== 16 && key.length !== 24 && key.length !== 32) {
+                        showToast('密钥长度必须为16位、24位或32位', 'error');
+                        return;
+                    }
+                    
+                    // ECB模式不需要IV，其他模式都需要16位IV
+                    if (mode !== 'ECB' && !iv) {
+                        showToast('除ECB模式外，其他模式都需要初始化向量(IV)', 'error');
+                        return;
+                    }
+                    
+                    if (mode !== 'ECB' && iv.length !== 16) {
+                        showToast('初始化向量(IV)长度必须为16位', 'error');
+                        return;
+                    }
+                    
+                    // 根据选择的模式获取CryptoJS模式对象
+                    let cipherMode;
+                    switch(mode) {
+                        case 'CBC':
+                            cipherMode = CryptoJS.mode.CBC;
+                            break;
+                        case 'CFB':
+                            cipherMode = CryptoJS.mode.CFB;
+                            break;
+                        case 'CTR':
+                            cipherMode = CryptoJS.mode.CTR;
+                            break;
+                        case 'OFB':
+                            cipherMode = CryptoJS.mode.OFB;
+                            break;
+                        case 'ECB':
+                            cipherMode = CryptoJS.mode.ECB;
+                            break;
+                        default:
+                            cipherMode = CryptoJS.mode.CBC;
+                    }
+                    
+                    // 根据选择的填充方式获取CryptoJS填充对象
+                    let paddingMode;
+                    switch(padding) {
+                        case 'Pkcs7':
+                            paddingMode = CryptoJS.pad.Pkcs7;
+                            break;
+                        case 'Iso97971':
+                            paddingMode = CryptoJS.pad.Iso97971;
+                            break;
+                        case 'AnsiX923':
+                            paddingMode = CryptoJS.pad.AnsiX923;
+                            break;
+                        case 'Iso10126':
+                            paddingMode = CryptoJS.pad.Iso10126;
+                            break;
+                        case 'ZeroPadding':
+                            paddingMode = CryptoJS.pad.ZeroPadding;
+                            break;
+                        case 'NoPadding':
+                            paddingMode = CryptoJS.pad.NoPadding;
+                            break;
+                        default:
+                            paddingMode = CryptoJS.pad.Pkcs7;
+                    }
+                    
+                    // 执行加密
+                    let encrypted;
+                    if (mode === 'ECB') {
+                        encrypted = CryptoJS.AES.encrypt(plaintext, CryptoJS.enc.Utf8.parse(key), {
+                            mode: cipherMode,
+                            padding: paddingMode
+                        });
+                    } else {
+                        encrypted = CryptoJS.AES.encrypt(plaintext, CryptoJS.enc.Utf8.parse(key), {
+                            iv: CryptoJS.enc.Utf8.parse(iv),
+                            mode: cipherMode,
+                            padding: paddingMode
+                        });
+                    }
+                    
+                    outputText.value = encrypted.toString();
+                } catch (e) {
+                    showToast('加密出错: ' + e.message, 'error');
+                }
+            });
+
+            // 解密功能
+            document.getElementById('decryptBtn').addEventListener('click', function() {
+                try {
+                    const ciphertext = inputText.value;
+                    const key = keyInput.value;
+                    const iv = ivInput.value;
+                    const mode = modeSelect.value;
+                    const padding = paddingSelect.value;
+                    
+                    if (!ciphertext) {
+                        showToast('请输入要解密的文本', 'error');
+                        return;
+                    }
+                    
+                    if (!key) {
+                        showToast('请输入密钥', 'error');
+                        return;
+                    }
+                    
+                    // 检查密钥长度
+                    if (key.length !== 16 && key.length !== 24 && key.length !== 32) {
+                        showToast('密钥长度必须为16位、24位或32位', 'error');
+                        return;
+                    }
+                    
+                    // ECB模式不需要IV，其他模式都需要16位IV
+                    if (mode !== 'ECB' && !iv) {
+                        showToast('除ECB模式外，其他模式都需要初始化向量(IV)', 'error');
+                        return;
+                    }
+                    
+                    if (mode !== 'ECB' && iv.length !== 16) {
+                        showToast('初始化向量(IV)长度必须为16位', 'error');
+                        return;
+                    }
+                    
+                    // 根据选择的模式获取CryptoJS模式对象
+                    let cipherMode;
+                    switch(mode) {
+                        case 'CBC':
+                            cipherMode = CryptoJS.mode.CBC;
+                            break;
+                        case 'CFB':
+                            cipherMode = CryptoJS.mode.CFB;
+                            break;
+                        case 'CTR':
+                            cipherMode = CryptoJS.mode.CTR;
+                            break;
+                        case 'OFB':
+                            cipherMode = CryptoJS.mode.OFB;
+                            break;
+                        case 'ECB':
+                            cipherMode = CryptoJS.mode.ECB;
+                            break;
+                        default:
+                            cipherMode = CryptoJS.mode.CBC;
+                    }
+                    
+                    // 根据选择的填充方式获取CryptoJS填充对象
+                    let paddingMode;
+                    switch(padding) {
+                        case 'Pkcs7':
+                            paddingMode = CryptoJS.pad.Pkcs7;
+                            break;
+                        case 'Iso97971':
+                            paddingMode = CryptoJS.pad.Iso97971;
+                            break;
+                        case 'AnsiX923':
+                            paddingMode = CryptoJS.pad.AnsiX923;
+                            break;
+                        case 'Iso10126':
+                            paddingMode = CryptoJS.pad.Iso10126;
+                            break;
+                        case 'ZeroPadding':
+                            paddingMode = CryptoJS.pad.ZeroPadding;
+                            break;
+                        case 'NoPadding':
+                            paddingMode = CryptoJS.pad.NoPadding;
+                            break;
+                        default:
+                            paddingMode = CryptoJS.pad.Pkcs7;
+                    }
+                    
+                    // 执行解密
+                    let decrypted;
+                    if (mode === 'ECB') {
+                        decrypted = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
+                            mode: cipherMode,
+                            padding: paddingMode
+                        });
+                    } else {
+                        decrypted = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Utf8.parse(key), {
+                            iv: CryptoJS.enc.Utf8.parse(iv),
+                            mode: cipherMode,
+                            padding: paddingMode
+                        });
+                    }
+                    
+                    outputText.value = decrypted.toString(CryptoJS.enc.Utf8);
+                } catch (e) {
+                    showToast('解密出错: ' + e.message, 'error');
+                }
+            });
+
+            // 交换内容
+            document.getElementById('swapBtn').addEventListener('click', function() {
+                const temp = inputText.value;
+                inputText.value = outputText.value;
+                outputText.value = temp;
+            });
+
+            // 清空功能
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                inputText.value = '';
+                outputText.value = '';
+                keyInput.value = '';
+                ivInput.value = '';
+            });
+
+            // 复制结果
+            document.getElementById('copyBtn').addEventListener('click', async function() {
+                try {
+                    await navigator.clipboard.writeText(outputText.value);
+                    showToast('已复制到剪贴板', 'success');
+                } catch (err) {
+                    showToast('复制失败: ' + err.message, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

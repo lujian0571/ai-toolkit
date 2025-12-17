@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICO图标生成 - AI工具箱</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../asset/common.css">
+    <style>
+        .preview-container {
+            max-width: 100%;
+            overflow: auto;
+        }
+        .image-preview {
+            width: 64px;
+            height: 64px;
+            display: block;
+            margin: 0 auto;
+        }
+        .preview-placeholder {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 4px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏占位符 -->
+    <div id="navbar-container"></div>
+
+    <div class="container container-main">
+        <!-- 面包屑导航 -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">图片处理</li>
+                <li class="breadcrumb-item">ICO图标生成</li>
+                <li class="breadcrumb-item active" aria-current="page">生成</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">图片上传与设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="imageUpload" class="form-label">选择图片</label>
+                            <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                        </div>
+                        
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle-fill"></i> 支持 JPG、PNG、WebP 等常见图片格式<br>
+                            <small>推荐使用正方形图片以获得最佳效果</small>
+                        </div>
+                        
+                        <!-- 使用分割线将上传和设置分开 -->
+                        <div class="d-flex align-items-center my-4">
+                          <div class="flex-grow-1 border-top"></div>
+                          <span class="mx-3 text-muted">
+                            <i class="bi bi-gear-fill me-1"></i>
+                            设置
+                          </span>
+                          <div class="flex-grow-1 border-top"></div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="icoSizes" class="form-label">图标尺寸</label>
+                            <select class="form-select" id="icoSizes" multiple>
+                                <option value="16" selected>16x16</option>
+                                <option value="24">24x24</option>
+                                <option value="32" selected>32x32</option>
+                                <option value="48">48x48</option>
+                                <option value="64" selected>64x64</option>
+                                <option value="128">128x128</option>
+                                <option value="256">256x256</option>
+                            </select>
+                            <small class="form-text text-muted">按住 Ctrl/Cmd 键可多选</small>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="generateIcoBtn" disabled>
+                            <i class="bi bi-app-indicator me-1"></i>
+                            生成ICO图标
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">预览</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="preview-container text-center">
+                            <div id="imagePreviewPlaceholder" class="preview-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                            <img id="imagePreview" class="image-preview d-none" alt="ICO图标预览">
+                            <p class="mt-2">64x64 预览</p>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" id="downloadBtn" disabled>
+                                    <i class="bi bi-download me-1"></i>
+                                    下载ICO图标
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3" id="icoInfo" style="display: none;">
+                            <div class="alert alert-info">
+                                <strong>ICO信息:</strong><br>
+                                包含尺寸: <span id="includedSizes"></span><br>
+                                文件大小: <span id="icoFileSize"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚占位符 -->
+    <div id="footer-container"></div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3"></div>
+
+    <!-- 引入必要的JavaScript -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../asset/navbar.js"></script>
+    <script src="../../asset/footer.js"></script>
+    <script src="../../asset/common.js"></script>
+    <script>
+        // 全局变量
+        let originalImage = null;
+        let icoBlobResult = null;
+        let originalFileName = '';
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 绑定事件
+            bindEvents();
+        });
+
+        // 绑定事件
+        function bindEvents() {
+            // 文件上传事件
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            
+            // 生成ICO按钮事件
+            document.getElementById('generateIcoBtn').addEventListener('click', generateICO);
+            
+            // 下载按钮事件
+            document.getElementById('downloadBtn').addEventListener('click', downloadICO);
+        }
+
+        // 处理图片上传
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 获取原始文件名（不含扩展名）
+            const fileName = file.name;
+            const lastDotIndex = fileName.lastIndexOf('.');
+            originalFileName = lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                showToast('请选择有效的图片文件', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    // 显示原始图片
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 启用生成按钮
+                    document.getElementById('generateIcoBtn').disabled = false;
+                    
+                    showToast('图片上传成功', 'success');
+                };
+                originalImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 生成ICO图标
+        function generateICO() {
+            if (!originalImage) {
+                showToast('请先上传图片', 'error');
+                return;
+            }
+
+            // 获取选中的尺寸
+            const selectedOptions = Array.from(document.getElementById('icoSizes').selectedOptions);
+            const sizes = selectedOptions.map(option => parseInt(option.value));
+            
+            if (sizes.length === 0) {
+                showToast('请至少选择一个尺寸', 'error');
+                return;
+            }
+
+            try {
+                // 创建包含不同尺寸的图片数组
+                const canvasArray = [];
+                
+                // 为每个尺寸创建画布
+                sizes.forEach(size => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    // 绘制图片
+                    ctx.fillStyle = '#FFFFFF'; // 设置白色背景
+                    ctx.fillRect(0, 0, size, size);
+                    ctx.drawImage(originalImage, 0, 0, size, size);
+                    
+                    canvasArray.push(canvas);
+                });
+                
+                // 生成ICO文件
+                const icoBlob = createIcoFile(canvasArray);
+                icoBlob.then(blob => {
+                    icoBlobResult = blob;
+                    
+                    // 显示预览（使用第一个尺寸）
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewPlaceholder = document.getElementById('imagePreviewPlaceholder');
+                    const url = URL.createObjectURL(blob);
+                    previewImg.src = url;
+                    previewImg.classList.remove('d-none');
+                    previewPlaceholder.classList.add('d-none');
+                    
+                    // 显示ICO信息
+                    document.getElementById('includedSizes').textContent = sizes.join(', ') + ' 像素';
+                    document.getElementById('icoFileSize').textContent = formatFileSize(blob.size);
+                    document.getElementById('icoInfo').style.display = 'block';
+                    
+                    // 启用下载按钮
+                    document.getElementById('downloadBtn').disabled = false;
+                    
+                    showToast('ICO图标生成完成', 'success');
+                }).catch(error => {
+                    showToast('ICO生成失败: ' + error.message, 'error');
+                });
+            } catch (error) {
+                showToast('ICO生成失败: ' + error.message, 'error');
+            }
+        }
+
+        // 下载ICO图标
+        function downloadICO() {
+            if (!icoBlobResult) {
+                showToast('没有可下载的ICO图标', 'error');
+                return;
+            }
+
+            const fileName = originalFileName + '.ico';
+            const url = URL.createObjectURL(icoBlobResult);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            showToast('ICO图标下载完成', 'success');
+        }
+
+        // 创建ICO文件
+        function createIcoFile(canvasArray) {
+            return new Promise((resolve, reject) => {
+                try {
+                    // ICO文件头
+                    const fileHeader = new ArrayBuffer(6);
+                    const headerView = new DataView(fileHeader);
+                    headerView.setUint16(0, 0, true); // Reserved
+                    headerView.setUint16(2, 1, true); // Icon type
+                    headerView.setUint16(4, canvasArray.length, true); // Number of images
+                    
+                    // 图像入口数组
+                    const entrySize = 16 * canvasArray.length;
+                    const entryBuffer = new ArrayBuffer(entrySize);
+                    const entryView = new DataView(entryBuffer);
+                    
+                    // 图像数据偏移量
+                    let imageDataOffset = 6 + entrySize;
+                    
+                    // 为每个图像创建入口
+                    const imageDataPromises = canvasArray.map((canvas, index) => {
+                        return new Promise((resolveCanvas) => {
+                            const size = canvas.width;
+                            
+                            // 设置入口信息
+                            const entryOffset = index * 16;
+                            entryView.setUint8(entryOffset, size === 256 ? 0 : size); // Width
+                            entryView.setUint8(entryOffset + 1, size === 256 ? 0 : size); // Height
+                            entryView.setUint8(entryOffset + 2, 0); // Color palette
+                            entryView.setUint8(entryOffset + 3, 0); // Reserved
+                            entryView.setUint16(entryOffset + 4, 1, true); // Color planes
+                            entryView.setUint16(entryOffset + 6, 32, true); // Bits per pixel
+                            
+                            // 将canvas转换为PNG数据
+                            canvas.toBlob((blob) => {
+                                blob.arrayBuffer().then(buffer => {
+                                    entryView.setUint32(entryOffset + 8, buffer.byteLength, true); // Image size
+                                    entryView.setUint32(entryOffset + 12, imageDataOffset, true); // Image offset
+                                    
+                                    imageDataOffset += buffer.byteLength;
+                                    resolveCanvas(buffer);
+                                });
+                            }, 'image/png');
+                        });
+                    });
+                    
+                    // 等待所有图像数据准备就绪
+                    Promise.all(imageDataPromises).then(imageDataArray => {
+                        // 计算总大小
+                        const totalSize = 6 + entrySize + imageDataArray.reduce((sum, data) => sum + data.byteLength, 0);
+                        const icoBuffer = new ArrayBuffer(totalSize);
+                        const icoView = new Uint8Array(icoBuffer);
+                        
+                        // 复制文件头
+                        icoView.set(new Uint8Array(fileHeader), 0);
+                        
+                        // 复制图像入口
+                        icoView.set(new Uint8Array(entryBuffer), 6);
+                        
+                        // 复制图像数据
+                        let offset = 6 + entrySize;
+                        imageDataArray.forEach(data => {
+                            icoView.set(new Uint8Array(data), offset);
+                            offset += data.byteLength;
+                        });
+                        
+                        // 创建Blob
+                        const blob = new Blob([icoBuffer], { type: 'image/x-icon' });
+                        resolve(blob);
+                    }).catch(reject);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
