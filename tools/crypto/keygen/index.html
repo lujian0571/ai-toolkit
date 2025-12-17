@@ -203,7 +203,7 @@
             
             // 复制功能
             document.querySelectorAll('.copy-btn').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', async function() {
                     const targetId = this.getAttribute('data-target');
                     const targetElement = document.getElementById(targetId);
                     
