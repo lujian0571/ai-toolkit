@@ -293,7 +293,7 @@ function initNavbar() {
     if (!navbarContainer) return;
 
     let navbarHtml = `
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
             <div class="container">
                 <a class="navbar-brand" href="${navbarConfig.brand.url}">
                     <i class="bi ${navbarConfig.brand.logo} me-2"></i>
@@ -328,13 +328,13 @@ function initNavbar() {
                         </li>`;
     });
 
-    // 添加 GitHub 链接
+    // 添加 GitHub Stars 徽章
     navbarHtml += `
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link" href="${navbarConfig.github.url}" target="_blank">
-                                <i class="bi bi-github"></i> GitHub
+                                <img src="https://img.shields.io/github/stars/lujian0571/ai-toolkit?style=social" alt="GitHub Stars">
                             </a>
                         </li>
                     </ul>

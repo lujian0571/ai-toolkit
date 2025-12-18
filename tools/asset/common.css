@@ -29,7 +29,7 @@
 
 .container-main {
     min-height: calc(100vh - 56px);
-    padding-top: 2rem;
+    padding-top: 4rem; /* 增加顶部内边距以补偿固定导航栏的高度 */
     padding-bottom: 2rem;
 }
 
@@ -73,3 +73,8 @@
 }
 
 /* 使用Bootstrap Toast样式，无需额外定义 */
+
+/* GitHub Stars 徽章样式 */
+.navbar-nav .nav-item img {
+    margin-top: 0.25rem;
+}

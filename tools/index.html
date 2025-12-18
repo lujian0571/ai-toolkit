@@ -8,64 +8,140 @@
     <link rel="stylesheet" href="./asset/common.css">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        /* 网站主标题样式 */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-subtitle a {
+            color: #fff;
+            text-decoration: none;
+        }
+        
+        .hero-subtitle a:hover {
+            color: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* 分类卡片样式 */
         .category-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            border: 1px solid rgba(0, 0, 0, 0.125);
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .category-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        .tool-card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            height: 100%;
-            cursor: pointer;
-            border: 1px solid rgba(0, 0, 0, 0.125);
-        }
-        
-        .tool-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
-        }
-        
-        .tool-card .card-body {
-            padding: 1.25rem;
-        }
-        
-        .tool-card .card-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-        }
-        
-        .tool-card .card-text {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-bottom: 1.25rem;
-        }
-        
-        .category-description {
-            font-size: 1.1rem;
-            color: #495057;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-link {
-            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
         
         .category-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            padding: 1.25rem;
+        }
+        
+        .category-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .category-title-section {
             display: flex;
             align-items: center;
+        }
+        
+        .category-header h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
         }
         
         .category-header i {
             font-size: 1.5rem;
             margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+        
+        .category-stats {
+            font-size: 0.9rem;
+            color: #6c757d;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            margin-left: 1rem;
+        }
+        
+        .category-description-inline {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-left: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .category-description-block {
+            font-size: 0.95rem;
+            color: #6c757d;
+            margin: 0.5rem 0 1rem 0;
+            padding: 0 1.25rem;
+            border: none;
+        }
+        
+        /* 工具卡片样式 */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            padding: 1.5rem;
+        }
+        
+        .tool-card {
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+            border-radius: 0.5rem;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            display: block;
+            min-height: 120px; /* 确保移动端有足够的点击区域 */
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        .tool-content {
+            padding: 1.25rem;
         }
         
         .tool-header {
@@ -75,20 +151,71 @@
         }
         
         .tool-header i {
-            font-size: 1.2rem;
-            margin-right: 0.5rem;
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background-color: #f1f3f4;
         }
         
-        /* 为不同分类的工具卡片设置不同的背景色 */
-        .tool-category-0 .tool-card { background-color: #fff8f8; }
-        .tool-category-1 .tool-card { background-color: #f8fff9; }
-        .tool-category-2 .tool-card { background-color: #f8f9ff; }
-        .tool-category-3 .tool-card { background-color: #fff9f8; }
-        .tool-category-4 .tool-card { background-color: #f9f8ff; }
-        .tool-category-5 .tool-card { background-color: #fff8fb; }
-        .tool-category-6 .tool-card { background-color: #f8fdff; }
-        .tool-category-7 .tool-card { background-color: #fdfff8; }
-        .tool-category-8 .tool-card { background-color: #faf8ff; }
+        .tool-card .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .tool-card .card-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0.75rem 0 0 0;
+            line-height: 1.5;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .tool-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .category-header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .category-description-inline {
+                margin: 0.5rem 0 0 0;
+            }
+            
+            .category-stats {
+                margin: 0.5rem 0 0 0;
+            }
+        }
+        
+        /* 特色标记 */
+        .featured-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ffc107;
+            color: #212529;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -96,8 +223,25 @@
     <div id="navbar-container"></div>
     
     <div class="container container-main">
-        <h1 class="mb-4">工具集</h1>
-        
+
+        <!-- 主页横幅 -->
+        <div class="hero-section">
+            <div class="container text-center">
+                <h1 class="hero-title">完全由大模型生成的在线工具箱</h1>
+                <p class="hero-subtitle">
+                    <a target="_blank" href="https://github.com/lujian0571/ai-toolkit/issues/1">🔥🔥🔥 用两句话生成新工具（通义灵码）</a>
+                </p>
+                <div class="search-box">
+                    <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                        <input type="text" class="form-control border-start-0" placeholder="搜索工具..." id="toolSearch">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 工具分类将在这里动态渲染 -->
         <div id="tools-container" class="row">
             <!-- 工具分类和工具将通过JavaScript动态生成 -->
@@ -115,7 +259,44 @@
         // 等待DOM加载完成后渲染工具分类
         document.addEventListener('DOMContentLoaded', function() {
             renderToolCategories();
+            
+            // 搜索功能
+            const searchInput = document.getElementById('toolSearch');
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filterTools(searchTerm);
+            });
         });
+        
+        // 根据搜索词过滤工具
+        function filterTools(searchTerm) {
+            const categoryElements = document.querySelectorAll('#tools-container > .col-12');
+            
+            categoryElements.forEach(categoryElement => {
+                const toolCards = categoryElement.querySelectorAll('.tool-card');
+                let visibleToolCount = 0;
+                
+                // 先重置所有工具卡片的显示状态
+                toolCards.forEach(card => {
+                    const toolName = card.querySelector('.card-title').textContent.toLowerCase();
+                    const toolDesc = card.querySelector('.card-text') ? card.querySelector('.card-text').textContent.toLowerCase() : '';
+                    
+                    if (searchTerm === '' || toolName.includes(searchTerm) || toolDesc.includes(searchTerm)) {
+                        card.style.display = '';
+                        visibleToolCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // 根据该分类下可见工具数量决定是否显示整个分类
+                if (searchTerm === '' || visibleToolCount > 0) {
+                    categoryElement.style.display = '';
+                } else {
+                    categoryElement.style.display = 'none';
+                }
+            });
+        }
         
         // 渲染工具分类
         function renderToolCategories() {
@@ -131,38 +312,39 @@
             let html = '';
             navbarConfig.categories.forEach((category, categoryIndex) => {
                 html += `
-                <div class="col-12">
-                    <div class="card category-card mb-4">
-                        <div class="card-header">
-                            <div class="category-header">
-                                <i class="bi ${category.icon}"></i>
-                                <h4 class="mb-0">${category.name}</h4>
+                <div class="col-12 mb-4">
+                    <div class="card category-card">
+                        <div class="category-header">
+                            <div class="category-header-content">
+                                <div class="category-title-section">
+                                    <i class="bi ${category.icon}"></i>
+                                    <h4 class="d-inline">${category.name}</h4>
+                                    <span class="category-stats">${category.items.length} 个工具</span>
+                                </div>
+                                ${category.description ? `<div class="category-description-inline">${category.description}</div>` : ''}
                             </div>
                         </div>
-                        <div class="card-body">
-                            ${category.description ? `<p class="category-description">${category.description}</p>` : ''}
-                            <div class="row tool-category-${categoryIndex % 9}">`;
+                        <div class="tool-grid">`;
                 
                 // 为每个工具项生成HTML
-                category.items.forEach(item => {
+                category.items.forEach((item, itemIndex) => {
+                    // 为前几个工具添加特色标记
+                    const featuredBadge = itemIndex < 2 ? '<span class="featured-badge">推荐</span>' : '';
+                    
                     html += `
-                                <div class="col-md-4 col-lg-3 mb-3">
-                                    <a href="${item.url}" class="card-link">
-                                        <div class="card tool-card">
-                                            <div class="card-body">
-                                                <div class="tool-header">
-                                                    <i class="bi ${item.icon}"></i>
-                                                    <h5 class="card-title mb-0">${item.name}</h5>
-                                                </div>
-                                                ${item.description ? `<p class="card-text">${item.description}</p>` : ''}
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>`;
+                            <a href="${item.url}" class="tool-card">
+                                ${featuredBadge}
+                                <div class="tool-content">
+                                    <div class="tool-header">
+                                        <i class="bi ${item.icon}"></i>
+                                        <h5 class="card-title">${item.name}</h5>
+                                    </div>
+                                    ${item.description ? `<p class="card-text">${item.description}</p>` : ''}
+                                </div>
+                            </a>`;
                 });
                 
                 html += `
-                            </div>
                         </div>
                     </div>
                 </div>`;

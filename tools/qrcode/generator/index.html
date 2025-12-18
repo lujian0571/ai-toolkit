@@ -34,27 +34,36 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="qrSize" class="form-label">尺寸 (像素)</label>
-                            <input type="range" class="form-range" min="100" max="500" step="10" value="200" id="qrSize">
+                            <div class="d-flex align-items-center mb-1">
+                                <label for="qrSize" class="form-label me-2 mb-0" style="width: 100px;">尺寸 (像素)</label>
+                                <input type="range" class="form-range flex-grow-1" min="100" max="500" step="10" value="200" id="qrSize">
+                            </div>
                             <div class="text-end">
                                 <span id="sizeValue">200</span> px
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="qrColor" class="form-label">前景色</label>
-                            <input type="color" class="form-control form-control-color" id="qrColor" value="#000000">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label for="qrColor" class="form-label me-2 mb-0" style="width: 70px;">前景色</label>
+                                    <input type="color" class="form-control form-control-color" id="qrColor" value="#000000" title="选择前景色">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <label for="qrBgColor" class="form-label me-2 mb-0" style="width: 70px;">背景色</label>
+                                    <input type="color" class="form-control form-control-color" id="qrBgColor" value="#ffffff" title="选择背景色">
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="qrBgColor" class="form-label">背景色</label>
-                            <input type="color" class="form-control form-control-color" id="qrBgColor" value="#ffffff">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="logoImage" class="form-label">Logo图片</label>
-                            <input class="form-control" type="file" id="logoImage" accept="image/*">
-                            <div class="form-text">支持JPG、PNG格式，建议尺寸小于二维码的1/5</div>
+                            <div class="d-flex align-items-center">
+                                <label for="logoImage" class="form-label me-2 mb-0" style="width: 100px;">Logo图片</label>
+                                <input class="form-control" type="file" id="logoImage" accept="image/*">
+                            </div>
+                            <div class="form-text mt-1">支持JPG、PNG格式，建议尺寸小于二维码的1/5</div>
                         </div>
                         
 
@@ -79,6 +88,51 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- 百科内容 -->
+        <div class="card mt-5">
+            <div class="card-header">
+                <h5 class="mb-0">关于二维码生成</h5>
+            </div>
+            <div class="card-body">
+                <h6>什么是二维码</h6>
+                <p>
+                    二维码（Quick Response Code，简称QR码）是一种矩阵条码，它能够在横向和纵向两个方向存储信息。
+                    相比传统的一维条码，二维码可以存储更多信息，包括网址、文本、联系方式等。
+                </p>
+                
+                <h6>二维码的用途</h6>
+                <ul>
+                    <li><strong>网站链接：</strong>将网址编码为二维码，用户扫码即可访问网站</li>
+                    <li><strong>产品信息：</strong>在商品上添加二维码，扫码可查看产品详情</li>
+                    <li><strong>支付码：</strong>移动支付中广泛使用二维码进行交易</li>
+                    <li><strong>名片分享：</strong>将个人信息编码为二维码，方便他人保存联系信息</li>
+                    <li><strong>营销推广：</strong>在广告中使用二维码引导用户了解更多信息</li>
+                </ul>
+                
+                <h6>如何使用本工具</h6>
+                <ol>
+                    <li><strong>输入内容：</strong>在内容输入框中输入要编码的信息，如网址、文本等</li>
+                    <li><strong>调整设置：</strong>根据需要调整二维码的尺寸、颜色等参数</li>
+                    <li><strong>添加Logo：</strong>可选择上传Logo图片，将其嵌入二维码中心</li>
+                    <li><strong>生成下载：</strong>系统会自动生成二维码，点击"下载二维码"保存到本地</li>
+                </ol>
+                
+                <h6>二维码设计建议</h6>
+                <ul>
+                    <li>保持足够的对比度，确保二维码容易扫描</li>
+                    <li>避免在二维码上添加过多装饰元素，以免影响扫描效果</li>
+                    <li>Logo大小不宜超过二维码的1/5，否则可能影响识别</li>
+                    <li>选择容错级别较高的设置，增强二维码的抗污损能力</li>
+                </ul>
+                
+                <h6>技术说明</h6>
+                <p>
+                    本工具使用 <a href="https://github.com/soldair/node-qrcode" target="_blank">qrcode</a> 库生成二维码，
+                    所有处理均在浏览器端完成，不会上传任何数据到服务器，确保用户隐私安全。
+                </p>
             </div>
         </div>
     </div>

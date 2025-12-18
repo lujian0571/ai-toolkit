@@ -1,5 +1,5 @@
 # The Docker image that will be used to build your app
-image: m.daocloud.io/docker.io/library/alpine:latest
+image: registry.lujian.org/dev/mirrors/alpine:latest
 
 create-pages:
   pages:
