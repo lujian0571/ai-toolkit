@@ -1,5 +1,5 @@
 create-pages:
-  image: registry.lujian.org/dev/mirrors/alpine:latest
+  image: registry.lujian.org/open/mirrors/alpine:latest
   pages:
     publish: tools
   rules:
