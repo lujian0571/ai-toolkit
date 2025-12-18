@@ -1,15 +1,10 @@
-# The Docker image that will be used to build your app
-image: registry.lujian.org/dev/mirrors/alpine:latest
-
 create-pages:
+  image: registry.lujian.org/dev/mirrors/alpine:latest
   pages:
-    # The folder that contains the files to be exposed at the Page URL
     publish: tools
   rules:
-    # This ensures that only pushes to the default branch will trigger
-    # a pages deploy
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
-  # Functions that should be executed before the build script is run
-  before_script: []
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" registry.lujian.org
   script:
     - echo "hello world"
